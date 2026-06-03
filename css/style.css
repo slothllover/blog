@@ -41,7 +41,7 @@ html, body {
     width: 100%;
     border-radius: 5px;
     outline: none;
-    color: #444;
+    color: #888;
     line-height: 1.5em;
     font-size: 1.2rem;
     font-family: "Poppins", sans-serif;
@@ -185,7 +185,7 @@ todo.html
     /* Footer - Contact Me */
 
     .contact-input {
-        background: #2a722a;
+        background: #278a27;
         color: white;
         margin-bottom: 10px;
         line-height: 1.5rem;

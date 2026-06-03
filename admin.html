@@ -3,17 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <title>Pannello Admin - Scrivi Post</title>
+    <link rel="stylesheet" href="css/style.css" />
     <style>
-        body { font-family: sans-serif; max-width: 600px; margin: 40px auto; padding: 20px; }
+        body { font-family: sans-serif; max-width: 1200px; margin: 40px auto; padding: 20px; }
         .form-group { margin-bottom: 15px; }
         label { display: block; margin-bottom: 5px; font-weight: bold; }
-        input[type="text"], input[type="password"], textarea { width: 100%; padding: 8px; box-sizing: border-box; }
-        textarea { height: 150px; }
+        input[type="text"], input[type="password"] { width: 100%; padding: 8px; box-sizing: border-box; }
         input[type="file"] { display: block; margin-top: 5px; }
         button { background: #3ecf8e; color: white; border: none; padding: 10px 20px; cursor: pointer; font-size: 16px; border-radius: 5px; }
         button:hover { background: #34b279; }
+
+        /* Toolbar */
+        #toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-bottom: 6px;
+        }
+        #toolbar button {
+            padding: 4px 10px;
+            font-size: 14px;
+            background: #f0f0f0;
+            color: #333;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            cursor: pointer;
+            min-width: 32px;
+        }
+        #toolbar button:hover {
+            background: #ddd;
+        }
+        #toolbar .sep {
+            width: 1px;
+            background: #ccc;
+            margin: 0 3px;
+            align-self: stretch;
+        }
+
+        /* Placeholder per contenteditable */
+        #content:empty:before {
+            content: attr(placeholder);
+            color: #aaa;
+            pointer-events: none;
+        }
     </style>
-        <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
 
@@ -31,8 +64,19 @@
     </div>
 
     <div id="admin-panel" style="display: none;">
-        <h2>Aggiungi un nuovo articolo</h2>
-        
+            <section class="hero">
+        <div class="container">
+            <div class="heading">
+                <h1 class="title">Aggiungi un nuovo articolo</h1>
+            </div>
+            <div class="content">
+                <p>
+                Qui puoi caaricare un post sul blog ufficiale. Controlla le credenziali inserite nel caso di errore di caricamento.
+                </p>
+            </div>
+        </div>
+    </section>
+
         <div class="form-group">
             <label for="title">Titolo</label>
             <input type="text" id="title" placeholder="Inserisci il titolo..." class="text-input contact-input">
@@ -52,8 +96,40 @@
         </div>
 
         <div class="form-group">
-            <label for="content">Contenuto</label>
-            <textarea id="content" placeholder="Scrivi il tuo articolo qui..." class="text-input"></textarea>
+            <label>Contenuto</label>
+
+            <div id="toolbar">
+                <button type="button" onclick="formato('bold')"><b>B</b></button>
+                <button type="button" onclick="formato('italic')"><i>I</i></button>
+                <button type="button" onclick="formato('underline')" style="text-decoration:underline">U</button>
+                <div class="sep"></div>
+                <button type="button" onclick="inserisci('À')">À</button>
+                <button type="button" onclick="inserisci('È')">È</button>
+                <button type="button" onclick="inserisci('É')">É</button>
+                <button type="button" onclick="inserisci('Ì')">Ì</button>
+                <button type="button" onclick="inserisci('Ò')">Ò</button>
+                <button type="button" onclick="inserisci('Ù')">Ù</button>
+                <div class="sep"></div>
+                <button type="button" onclick="inserisci('ä')">ä</button>
+                <button type="button" onclick="inserisci('ö')">ö</button>
+                <button type="button" onclick="inserisci('ü')">ü</button>
+                <button type="button" onclick="inserisci('Ä')">Ä</button>
+                <button type="button" onclick="inserisci('Ö')">Ö</button>
+                <button type="button" onclick="inserisci('Ü')">Ü</button>
+                <button type="button" onclick="inserisci('ß')">ß</button>
+                <div class="sep"></div>
+                <button type="button" onclick="inserisci('«')">«</button>
+                <button type="button" onclick="inserisci('»')">»</button>
+                <button type="button" onclick="inserisci('…')">…</button>
+                <button type="button" onclick="inserisci('—')">—</button>
+            </div>
+
+            <div id="content"
+                 contenteditable="true"
+                 class="text-input"
+                 style="min-height: 200px; border: 1px solid #ccc; background: white; cursor: text;"
+                 placeholder="Scrivi il tuo articolo qui...">
+            </div>
         </div>
 
         <button id="submit-btn">Pubblica Post</button>
@@ -61,6 +137,21 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <script>
+        const editor = document.getElementById('content');
+
+        function formato(cmd) {
+            document.execCommand(cmd, false, null);
+            editor.focus();
+        }
+
+        function inserisci(char) {
+            editor.focus();
+            document.execCommand('insertText', false, char);
+        }
+    </script>
+
     <script src="js/admin.js"></script>
 </body>
 </html>

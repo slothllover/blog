@@ -54,7 +54,7 @@ const submitBtn = document.getElementById('submit-btn');
 if (submitBtn) {
     submitBtn.addEventListener('click', async () => {
         const titleInput = document.getElementById('title').value;
-        const contentInput = document.getElementById('content').value;
+        const contentInput = document.getElementById('content').innerHTML;
         const imageElement = document.getElementById('image');
         const imageFile = imageElement ? imageElement.files[0] : null;
 
