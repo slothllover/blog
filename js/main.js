@@ -25,7 +25,7 @@ function generaFooter() {
                 <div class="footer-section links">
                     <h2>Quick Links</h2>
                     <div class="quick-links">
-                        <a href="books.html"><i class="fas fa-book-open"></i> &nbsp; Books I Read</a>
+                        <a href="books.html"><i class="fas fa-book-open"></i> &nbsp; Books I have Read</a>
                         <a href="redbull.html"><i class="fas fa-mountain"></i> &nbsp; Redbull Ivy images</a>
                     </div>
                 </div>

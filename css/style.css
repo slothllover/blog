@@ -298,14 +298,22 @@ todo.html
 }
 
 .hero .container .content {
-    display: flex;
-    justify-content: space-between;
-    align-items:center;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 10px;
+    align-items: start; /* importante: allinea in alto, non al centro */
 }
 
 .hero .container .content img {
+    max-width: 400px;
+    width: 35vw;
     padding: 10px;
-    max-width: 35%;
+}
+
+.hero .container .content::after {
+    content: "";
+    display: table;
+    clear: both;
 }
 
 /* Books */
@@ -341,13 +349,20 @@ todo.html
 }
 
 .bookreview .container .content {
-    display: flex;
-    align-items:center;
+    display: block; /* rimuove il flex */
 }
 
 .bookreview .container .content img {
+    float: left;
     max-height: 300px;
     padding: 10px;
+    margin-right: 10px;
+}
+
+.bookreview .container .content::after {
+    content: "";
+    display: table;
+    clear: both;
 }
 
 /* About Me */
