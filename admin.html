@@ -91,9 +91,20 @@
         </div>
 
         <div class="form-group">
-            <label for="image">Immagine di Copertina</label>
-            <input type="file" id="image" accept="image/*">
+            <label for="layout">Layout immagini</label>
+            <select id="layout" style="width: 100%; padding: 8px; border-radius: 5px; font-family: inherit;">
+                <option value="single">1 immagine (come adesso)</option>
+                <option value="two-side">2 immagini affiancate (sinistra/destra)</option>
+                <option value="two-stack">2 immagini impilate (sopra/sotto)</option>
+                <option value="three-big-left">3: grande a sinistra + 2 piccole a destra</option>
+                <option value="three-big-right">3: grande a destra + 2 piccole a sinistra</option>
+                <option value="three-big-top">3: grande sopra + 2 piccole sotto</option>
+                <option value="three-big-bottom">3: grande sotto + 2 piccole sopra</option>
+                <option value="four-grid">4 immagini (griglia 2×2)</option>
+            </select>
         </div>
+
+        <div id="image-slots"></div>
 
         <div class="form-group">
             <label>Contenuto</label>

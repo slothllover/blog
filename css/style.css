@@ -316,6 +316,67 @@ todo.html
     clear: both;
 }
 
+/* Galleria multi-immagine (nuovo) */
+
+.hero .container .content .gallery {
+    display: grid;
+    gap: 8px;
+    width: 35vw;
+    max-width: 400px;
+    align-self: start;
+}
+
+.hero .container .content .gallery img {
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    padding: 0;
+    object-fit: cover;
+    border-radius: 8px;
+    display: block;
+}
+
+/* Layout a 2 immagini */
+.hero .container .content .gallery-two-side {
+    grid-template-areas: "a b";
+    grid-template-columns: 1fr 1fr;
+    grid-auto-rows: 170px;
+}
+.hero .container .content .gallery-two-stack {
+    grid-template-areas: "a" "b";
+    grid-template-columns: 1fr;
+    grid-auto-rows: 170px;
+}
+
+/* Layout a 3 immagini */
+.hero .container .content .gallery-three-big-left {
+    grid-template-areas: "a b" "a c";
+    grid-template-columns: 2fr 1fr;
+    grid-template-rows: 170px 170px;
+}
+.hero .container .content .gallery-three-big-right {
+    grid-template-areas: "b a" "c a";
+    grid-template-columns: 1fr 2fr;
+    grid-template-rows: 170px 170px;
+}
+.hero .container .content .gallery-three-big-top {
+    grid-template-areas: "a a" "b c";
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 220px 150px;
+}
+.hero .container .content .gallery-three-big-bottom {
+    grid-template-areas: "b c" "a a";
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 150px 220px;
+}
+
+/* Layout a 4 immagini */
+.hero .container .content .gallery-four-grid {
+    grid-template-areas: "a b" "c d";
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 170px 170px;
+}
+
 /* Books */
 
 .bookreview {

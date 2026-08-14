@@ -44,18 +44,30 @@ async function caricaPost() {
 
     // 3. Cicliamo tutti i post ricevuti e generiamo l'HTML con la tua grafica originale
     posts.forEach(post => {
-        // Se l'admin ha inserito un URL per l'immagine, creiamo il tag HTML, altrimenti lo lasciamo vuoto
-        // Se c'è un'immagine, applichiamo l'ottimizzazione di Cloudinary al volo
-        let tagImmagine = "";
-        if (post.immagine && post.immagine.trim() !== "") {
-            
-            // Se l'immagine arriva da Cloudinary, inseriamo i parametri di ottimizzazione nel link
-            let urlOttimizzato = post.immagine;
-            if (urlOttimizzato.includes("cloudinary.com")) {
-                urlOttimizzato = urlOttimizzato.replace("/upload/", "/upload/f_auto,q_auto/");
+        // Ottimizzazione Cloudinary al volo (lascia invariati i link non-Cloudinary)
+        const ottimizzaUrl = (url) => {
+            if (url && url.includes("cloudinary.com")) {
+                return url.replace("/upload/", "/upload/f_auto,q_auto/");
             }
+            return url;
+        };
 
-            tagImmagine = `<img src="${urlOttimizzato}" alt="Copertina">`;
+        // Blocco immagini: galleria multi-immagine (nuovo) oppure singola immagine (comportamento attuale)
+        let tagImmagine = "";
+
+        // 1) Galleria multi-immagine (colonna 'galleria')
+        if (post.galleria && Array.isArray(post.galleria.images) && post.galleria.images.length >= 2) {
+            const layout = post.galleria.layout || "four-grid";
+            const aree = ["a", "b", "c", "d"];
+            const imgTags = post.galleria.images
+                .slice(0, 4)
+                .map((url, i) => `<img src="${ottimizzaUrl(url)}" alt="Immagine ${i + 1}" style="grid-area: ${aree[i]};">`)
+                .join("");
+            tagImmagine = `<div class="gallery gallery-${layout}">${imgTags}</div>`;
+        }
+        // 2) Fallback: singola immagine (post esistenti)
+        else if (post.immagine && post.immagine.trim() !== "") {
+            tagImmagine = `<img src="${ottimizzaUrl(post.immagine)}" alt="Copertina">`;
         }
 
 // Formattiamo la data includendo ora e minuti (formato 24 ore)
