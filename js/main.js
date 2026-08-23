@@ -22,7 +22,7 @@ function generaNavbar(pageTitle) {
                     </a>
                 </div>
                 <div>
-                    <a href="index.html" class="page-name">${titolo} <span>-</span> Paolo's life Blog</a>
+                    <a href="index.html" class="page-name">${titolo} <span>-</span> Paolo Cimenti's Blog</a>
                 </div>
             </div>
             <div class="navbar-right">
@@ -55,8 +55,8 @@ function generaFooter() {
         <div class="footer">
             <div class="footer-content">
                 <div class="footer-section about">
-                    <h2 class="logo-text">Paolo's <span>Life</span> Blog</h2>
-                    <p>Paolo's Life Blog is my first site, I created it as an experiment 
+                    <h2 class="logo-text">Paolo Cimenti's <span>Blog</span></h2>
+                    <p>Paolo Cimenti's Blog is my first site, I created it as an experiment 
                         to learn HTML, CSS and JavaScript. <br>
                         I am continuing do update this blog and I can't 
                         wait to see where this project goes!
