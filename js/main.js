@@ -95,7 +95,7 @@ function generaFooter() {
                 </div>
             </div>
             <div class="footer-bottom">
-                &copy; paoloslife.com | Designed by Paolo Cimenti | since 2024
+                &copy; paolocimenti.com | Designed by Paolo Cimenti | since 2024
             </div>
         </div>
     `;

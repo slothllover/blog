@@ -1177,3 +1177,285 @@ todo.html
 .admin-sub-badge.Elettronica   { background: #fff0cc; color: #9a6e00; }
 .admin-sub-badge.Informatica   { background: #cce5ff; color: #004e9a; }
 .admin-sub-badge.AI            { background: #e8ccff; color: #5c009a; }
+
+/* ============================================================
+   RESPONSIVE — Mobile & Tablet
+   ============================================================ */
+
+/* ---- Tablet (≤768px) ---- */
+
+@media (max-width: 768px) {
+
+    /* Navbar: hide page-name text on small screens, keep logo + menu */
+    .navbar {
+        padding: 14px;
+        border-bottom-left-radius: 14px;
+        border-bottom-right-radius: 14px;
+    }
+
+    .navbar-left .page-name {
+        font-size: 14px;
+    }
+
+    .logo {
+        width: 5cap;
+        margin-right: 10px;
+    }
+
+    .dropdown-toggle {
+        padding: 10px 14px;
+        font-size: 14px;
+    }
+
+    /* Hero / cards — single column */
+    .hero .container .content {
+        grid-template-columns: 1fr;
+    }
+
+    .hero .container .content img {
+        width: 100%;
+        max-width: 100%;
+        padding: 0;
+        margin-top: 10px;
+    }
+
+    .hero .container .content .gallery {
+        width: 100%;
+        max-width: 100%;
+        margin-top: 10px;
+    }
+
+    /* Header: title + date stacked */
+    .hero .container .heading,
+    .bookreview .container .heading,
+    .todo .container .heading {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
+        padding-bottom: 16px;
+    }
+
+    .hero .container .heading p,
+    .bookreview .container .heading p {
+        text-align: left;
+        margin: 0;
+    }
+
+    /* Book review: no float on mobile */
+    .bookreview .container .content img {
+        float: none;
+        display: block;
+        max-height: 250px;
+        max-width: 100%;
+        margin: 0 auto 12px;
+        padding: 0;
+    }
+
+    /* Footer: stack columns */
+    .footer {
+        height: auto;
+        border-top-left-radius: 14px;
+        border-top-right-radius: 14px;
+    }
+
+    .footer .footer-content {
+        height: auto;
+        flex-direction: column;
+    }
+
+    .footer .footer-section {
+        padding: 12px 15px;
+    }
+
+    .footer .footer-bottom {
+        position: relative;
+        height: auto;
+        padding: 12px 15px;
+        font-size: 13px;
+    }
+
+    /* About Me: intro stacks */
+    .whoami .container .content .introduction {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .whoami .container .content .introduction img {
+        margin: 0 auto 12px;
+    }
+
+    .whoami .container .content .introduction p {
+        margin: 0;
+    }
+
+    /* Projects page tabs */
+    .projects-tabs {
+        gap: 6px;
+    }
+
+    .projects-tabs .tab {
+        padding: 6px 14px;
+        font-size: 13px;
+    }
+
+    .projects-header h1 {
+        font-size: 1.5rem;
+    }
+
+    /* Contact Me intros */
+    .contactme .container .content .introduction {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    /* Admin: stack tabs */
+    .admin-tab {
+        padding: 8px 14px;
+        font-size: 13px;
+    }
+
+    .admin-tab-logout {
+        margin-left: 0;
+    }
+
+    /* Admin form row → column */
+    #tab-new-post > div:first-of-type {
+        flex-direction: column;
+    }
+
+    /* Admin post list: scrollable table */
+    .admin-post-list {
+        font-size: 13px;
+    }
+
+    .admin-post-list .post-title-cell {
+        max-width: 160px;
+    }
+
+    .admin-post-list th:nth-child(3),
+    .admin-post-list td:nth-child(3) {
+        display: none;
+    }
+
+    /* Lightbox nav */
+    .lightbox-nav {
+        width: 40px;
+        height: 40px;
+        font-size: 26px;
+    }
+
+    .lightbox-close {
+        top: 10px;
+        right: 14px;
+        font-size: 34px;
+    }
+}
+
+/* ---- Phone (≤480px) ---- */
+
+@media (max-width: 480px) {
+
+    /* Navbar: hide page name entirely, show only logo + menu */
+    .navbar-left .page-name {
+        display: none;
+    }
+
+    .dropdown-toggle {
+        padding: 9px 12px;
+        font-size: 13px;
+    }
+
+    .dropdown-menu {
+        min-width: 170px;
+    }
+
+    /* Cards: reduce padding */
+    .hero,
+    .bookreview,
+    .todo,
+    .whoami,
+    .projects,
+    .contactme,
+    .projects-page {
+        border-radius: 12px;
+        margin: 12px 8px;
+    }
+
+    .hero .container,
+    .bookreview .container,
+    .todo .container {
+        padding: 14px;
+    }
+
+    .hero .container .heading h1,
+    .bookreview .container .heading h1 {
+        font-size: 1.1rem;
+    }
+
+    .hero .container .heading p {
+        font-size: 65%;
+    }
+
+    /* Gallery: always single column on phone */
+    .hero .container .content .gallery {
+        grid-template-columns: 1fr !important;
+        grid-template-areas: none !important;
+    }
+
+    .hero .container .content .gallery img {
+        grid-area: auto !important;
+    }
+
+    .hero .container .content .gallery-two-side,
+    .hero .container .content .gallery-two-stack,
+    .hero .container .content .gallery-three-big-left,
+    .hero .container .content .gallery-three-big-right,
+    .hero .container .content .gallery-three-big-top,
+    .hero .container .content .gallery-three-big-bottom,
+    .hero .container .content .gallery-four-grid {
+        grid-template-columns: 1fr !important;
+        grid-template-rows: auto !important;
+    }
+
+    /* Projects page: smaller tabs */
+    .projects-tabs {
+        gap: 4px;
+        padding: 8px 0 14px;
+    }
+
+    .projects-tabs .tab {
+        padding: 5px 12px;
+        font-size: 12px;
+    }
+
+    /* Admin: even tighter */
+    .admin-tabs {
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .admin-tab-content {
+        padding: 14px;
+    }
+
+    .admin-btn {
+        padding: 8px 16px;
+        font-size: 14px;
+    }
+
+    .admin-content-editor {
+        min-height: 150px;
+    }
+
+    /* Lightbox smaller nav */
+    .lightbox-nav {
+        width: 34px;
+        height: 34px;
+        font-size: 22px;
+    }
+
+    .lightbox-img {
+        max-width: 95vw;
+        max-height: 75vh;
+    }
+}
