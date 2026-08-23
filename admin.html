@@ -2,167 +2,188 @@
 <html lang="it">
 <head>
     <meta charset="UTF-8">
-    <title>Pannello Admin - Scrivi Post</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin — Paolo's Life Blog</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="css/style.css" />
-    <style>
-        body { font-family: sans-serif; max-width: 1200px; margin: 40px auto; padding: 20px; }
-        .form-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; font-weight: bold; }
-        input[type="text"], input[type="password"] { width: 100%; padding: 8px; box-sizing: border-box; }
-        input[type="file"] { display: block; margin-top: 5px; }
-        button { background: #3ecf8e; color: white; border: none; padding: 10px 20px; cursor: pointer; font-size: 16px; border-radius: 5px; }
-        button:hover { background: #34b279; }
-
-        /* Toolbar */
-        #toolbar {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 5px;
-            margin-bottom: 6px;
-        }
-        #toolbar button {
-            padding: 4px 10px;
-            font-size: 14px;
-            background: #f0f0f0;
-            color: #333;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            cursor: pointer;
-            min-width: 32px;
-        }
-        #toolbar button:hover {
-            background: #ddd;
-        }
-        #toolbar .sep {
-            width: 1px;
-            background: #ccc;
-            margin: 0 3px;
-            align-self: stretch;
-        }
-
-        /* Placeholder per contenteditable */
-        #content:empty:before {
-            content: attr(placeholder);
-            color: #aaa;
-            pointer-events: none;
-        }
-    </style>
+    <link rel="shortcut icon" href="images/profile.png" type="image/x-icon"/>
 </head>
 <body>
 
-    <div id="login-box" style="max-width: 400px; margin: 100px auto; padding: 20px; border: 1px solid #ccc; border-radius: 8px;">
-        <h2>Accesso Amministratore</h2>
-        <div class="form-group">
-            <label>Email</label>
-            <input type="text" id="login-email" placeholder="La tua email...">
-        </div>
-        <div class="form-group">
-            <label>Password</label>
-            <input type="password" id="login-password" placeholder="La tua password...">
-        </div>
-        <button id="login-btn">Accedi</button>
-    </div>
+    <nav id="navbar-container" data-page="Admin"></nav>
 
-    <div id="admin-panel" style="display: none;">
-            <section class="hero">
-        <div class="container">
-            <div class="heading">
-                <h1 class="title">Aggiungi un nuovo articolo</h1>
+    <div class="admin-wrap">
+
+        <!-- ====== LOGIN BOX ====== -->
+        <div id="login-box" class="admin-login">
+            <h2><i class="fas fa-lock"></i> Accesso Amministratore</h2>
+            <div class="form-group">
+                <label>Email</label>
+                <input type="text" id="login-email" placeholder="La tua email…">
             </div>
-            <div class="content">
-                <p>
-                Qui puoi caricare un post sul blog ufficiale. Controlla le credenziali inserite nel caso di errore di caricamento.
-                </p>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="login-password" placeholder="La tua password…">
             </div>
-        </div>
-    </section>
-
-        <div class="form-group">
-            <label for="title">Titolo</label>
-            <input type="text" id="title" placeholder="Inserisci il titolo..." class="text-input contact-input">
+            <button id="login-btn" class="admin-btn admin-btn-primary" style="width:100%;">
+                <i class="fas fa-sign-in-alt"></i> Accedi
+            </button>
         </div>
 
-        <div class="form-group">
-            <label for="category">Destinazione Post</label>
-            <select id="category" style="width: 100%; padding: 8px; border-radius: 5px; font-family: inherit;">
-                <option value="blog">Home Page (Blog)</option>
-                <option value="books">Libri letti (Books)</option>
-            </select>
-        </div>
+        <!-- ====== ADMIN PANEL ====== -->
+        <div id="admin-panel" style="display: none;">
 
-        <div class="form-group">
-            <label for="layout">Layout immagini</label>
-            <select id="layout" style="width: 100%; padding: 8px; border-radius: 5px; font-family: inherit;">
-                <option value="single">1 immagine</option>
-                <option value="two-side">2 immagini affiancate (sinistra/destra)</option>
-                <option value="two-stack">2 immagini impilate (sopra/sotto)</option>
-                <option value="three-big-left">3: grande a sinistra + 2 piccole a destra</option>
-                <option value="three-big-right">3: grande a destra + 2 piccole a sinistra</option>
-                <option value="three-big-top">3: grande sopra + 2 piccole sotto</option>
-                <option value="three-big-bottom">3: grande sotto + 2 piccole sopra</option>
-                <option value="four-grid">4 immagini (griglia 2×2)</option>
-            </select>
-        </div>
-
-        <div id="image-slots"></div>
-
-        <div class="form-group">
-            <label>Contenuto</label>
-
-            <div id="toolbar">
-                <button type="button" onclick="formato('bold')"><b>B</b></button>
-                <button type="button" onclick="formato('italic')"><i>I</i></button>
-                <button type="button" onclick="formato('underline')" style="text-decoration:underline">U</button>
-                <div class="sep"></div>
-                <button type="button" onclick="inserisci('À')">À</button>
-                <button type="button" onclick="inserisci('È')">È</button>
-                <button type="button" onclick="inserisci('É')">É</button>
-                <button type="button" onclick="inserisci('Ì')">Ì</button>
-                <button type="button" onclick="inserisci('Ò')">Ò</button>
-                <button type="button" onclick="inserisci('Ù')">Ù</button>
-                <div class="sep"></div>
-                <button type="button" onclick="inserisci('ä')">ä</button>
-                <button type="button" onclick="inserisci('ö')">ö</button>
-                <button type="button" onclick="inserisci('ü')">ü</button>
-                <button type="button" onclick="inserisci('Ä')">Ä</button>
-                <button type="button" onclick="inserisci('Ö')">Ö</button>
-                <button type="button" onclick="inserisci('Ü')">Ü</button>
-                <button type="button" onclick="inserisci('ß')">ß</button>
-                <div class="sep"></div>
-                <button type="button" onclick="inserisci('«')">«</button>
-                <button type="button" onclick="inserisci('»')">»</button>
-                <button type="button" onclick="inserisci('…')">…</button>
-                <button type="button" onclick="inserisci('—')">—</button>
+            <!-- Tabs -->
+            <div class="admin-tabs">
+                <button class="admin-tab active" data-tab="new-post">
+                    <i class="fas fa-pen"></i> Scrivi Post
+                </button>
+                <button class="admin-tab" data-tab="manage-posts">
+                    <i class="fas fa-list"></i> I Miei Post
+                </button>
+                <button class="admin-tab admin-tab-logout" id="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i> Esci
+                </button>
             </div>
 
-            <div id="content"
-                 contenteditable="true"
-                 class="text-input"
-                 style="min-height: 200px; border: 1px solid #ccc; background: white; cursor: text;"
-                 placeholder="Scrivi il tuo articolo qui...">
-            </div>
-        </div>
+            <!-- TAB: Nuovo Post -->
+            <div id="tab-new-post" class="admin-tab-content active">
 
-        <button id="submit-btn">Pubblica Post</button>
-        <button id="logout-btn" style="background: #ff4747; margin-top: 20px;">Sconnettiti</button>
+                <section class="hero">
+                    <div class="container">
+                        <div class="heading">
+                            <h1 class="title" id="form-mode-title">Nuovo articolo</h1>
+                        </div>
+                        <p id="form-mode-hint">
+                            Compila il form qui sotto per pubblicare un post. Scegli la destinazione in base al tipo di contenuto.
+                        </p>
+                    </div>
+                </section>
+
+                <!-- Hidden field: post ID (populated when editing) -->
+                <input type="hidden" id="edit-id" value="">
+
+                <!-- Category + Subcategory in a row -->
+                <div style="display: flex; gap: 16px; flex-wrap: wrap;">
+                    <div class="admin-form-group" style="flex: 1; min-width: 200px;">
+                        <label for="category">Destinazione</label>
+                        <select id="category">
+                            <option value="blog">Home Page (Blog)</option>
+                            <option value="books">Libri</option>
+                            <option value="projects">Progetti</option>
+                        </select>
+                    </div>
+                    <div class="admin-form-group" id="subcategory-group" style="flex: 1; min-width: 200px; display: none;">
+                        <label for="subcategory">Sottocategoria Progetto</label>
+                        <select id="subcategory">
+                            <option value="Elettronica">Elettronica</option>
+                            <option value="Informatica">Informatica</option>
+                            <option value="AI">AI</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Title -->
+                <div class="admin-form-group">
+                    <label for="title">Titolo</label>
+                    <input type="text" id="title" placeholder="Inserisci il titolo…" class="text-input contact-input">
+                </div>
+
+                <!-- Layout -->
+                <div class="admin-form-group">
+                    <label for="layout">Layout immagini</label>
+                    <select id="layout">
+                        <option value="single">1 immagine (default)</option>
+                        <option value="two-side">2 affiancate</option>
+                        <option value="two-stack">2 impilate</option>
+                        <option value="three-big-left">3: grande sinistra + 2 destra</option>
+                        <option value="three-big-right">3: grande destra + 2 sinistra</option>
+                        <option value="three-big-top">3: grande sopra + 2 sotto</option>
+                        <option value="three-big-bottom">3: grande sotto + 2 sopra</option>
+                        <option value="four-grid">4 in griglia 2×2</option>
+                    </select>
+                </div>
+
+                <!-- Image slots -->
+                <div id="image-slots"></div>
+
+                <!-- Content editor -->
+                <div class="admin-form-group">
+                    <label>Contenuto</label>
+                    <div class="admin-toolbar">
+                        <button type="button" onclick="formato('bold')"><b>B</b></button>
+                        <button type="button" onclick="formato('italic')"><i>I</i></button>
+                        <button type="button" onclick="formato('underline')" style="text-decoration:underline">U</button>
+                        <div class="sep"></div>
+                        <button type="button" onclick="inserisci('À')">À</button>
+                        <button type="button" onclick="inserisci('È')">È</button>
+                        <button type="button" onclick="inserisci('É')">É</button>
+                        <button type="button" onclick="inserisci('Ì')">Ì</button>
+                        <button type="button" onclick="inserisci('Ò')">Ò</button>
+                        <button type="button" onclick="inserisci('Ù')">Ù</button>
+                        <div class="sep"></div>
+                        <button type="button" onclick="inserisci('ä')">ä</button>
+                        <button type="button" onclick="inserisci('ö')">ö</button>
+                        <button type="button" onclick="inserisci('ü')">ü</button>
+                        <button type="button" onclick="inserisci('Ä')">Ä</button>
+                        <button type="button" onclick="inserisci('Ö')">Ö</button>
+                        <button type="button" onclick="inserisci('Ü')">Ü</button>
+                        <button type="button" onclick="inserisci('ß')">ß</button>
+                        <div class="sep"></div>
+                        <button type="button" onclick="inserisci('«')">«</button>
+                        <button type="button" onclick="inserisci('»')">»</button>
+                        <button type="button" onclick="inserisci('…')">…</button>
+                        <button type="button" onclick="inserisci('—')">—</button>
+                    </div>
+                    <div id="content"
+                         contenteditable="true"
+                         class="admin-content-editor"
+                         placeholder="Scrivi il tuo articolo qui…">
+                    </div>
+                </div>
+
+                <!-- Buttons -->
+                <div style="display: flex; gap: 10px; margin-top: 10px;">
+                    <button id="submit-btn" class="admin-btn admin-btn-primary">
+                        <i class="fas fa-paper-plane"></i> Pubblica
+                    </button>
+                    <button id="clear-form-btn" class="admin-btn" style="background:#eee; color:#555; display:none;">
+                        <i class="fas fa-times"></i> Annulla modifiche
+                    </button>
+                </div>
+
+                <p id="form-status" style="margin-top: 12px; font-size: 14px; color: #666;"></p>
+            </div>
+
+            <!-- TAB: Gestisci Post -->
+            <div id="tab-manage-posts" class="admin-tab-content">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                    <h2 style="margin:0; color:#313131;">Tutti i Post</h2>
+                    <button id="refresh-posts-btn" class="admin-btn admin-btn-small" style="background:#eee; color:#555;">
+                        <i class="fas fa-sync-alt"></i> Aggiorna
+                    </button>
+                </div>
+                <div id="post-list" style="overflow-x: auto;">
+                    <p style="text-align: center; color: #999; padding: 30px;">Caricamento…</p>
+                </div>
+            </div>
+
+        </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
+    <!-- Inline editor helpers -->
     <script>
         const editor = document.getElementById('content');
-
-        function formato(cmd) {
-            document.execCommand(cmd, false, null);
-            editor.focus();
-        }
-
-        function inserisci(char) {
-            editor.focus();
-            document.execCommand('insertText', false, char);
-        }
+        function formato(cmd) { document.execCommand(cmd, false, null); editor.focus(); }
+        function inserisci(ch) { editor.focus(); document.execCommand('insertText', false, ch); }
     </script>
 
     <script src="js/admin.js"></script>
+    <script src="js/main.js"></script>
 </body>
 </html>

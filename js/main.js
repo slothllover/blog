@@ -1,3 +1,52 @@
+// ============================================================
+// main.js — Shared components for paoloslife.com
+// ============================================================
+
+// ---- Navbar (shared across all pages) ----
+// Call: generaNavbar('Home')   or   generaNavbar('Progetti')
+// Add <nav id="navbar-container"></nav> in each page.
+
+function generaNavbar(pageTitle) {
+    const nav = document.getElementById('navbar-container');
+    if (!nav) return;
+
+    const titolo = pageTitle || '';
+
+    nav.innerHTML = `
+    <div class="navbar">
+        <div class="container">
+            <div class="navbar-left">
+                <div class="logo">
+                    <a href="index.html">
+                        <img src="images/profile.png" alt="logo">
+                    </a>
+                </div>
+                <div>
+                    <a href="index.html" class="page-name">${titolo} <span>-</span> Paolo's life Blog</a>
+                </div>
+            </div>
+            <div class="navbar-right">
+                <div class="dropdown">
+                    <button class="dropdown-toggle" aria-label="Menu">
+                        Menu <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="dropdown-menu">
+                        <a href="index.html"><i class="fas fa-home"></i> Home</a>
+                        <a href="aboutme.html"><i class="fas fa-user"></i> About Me</a>
+                        <div class="dropdown-divider"></div>
+                        <a href="todo.html"><i class="fas fa-check-square"></i> ToDo</a>
+                        <a href="books.html"><i class="fas fa-book-open"></i> Libri</a>
+                        <a href="projects.html"><i class="fas fa-rocket"></i> Progetti</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>`;
+}
+
+// ---- Footer (shared across all pages) ----
+// Add <div id="footer-condiviso"></div> in each page.
+
 function generaFooter() {
     const footerContainer = document.getElementById('footer-condiviso');
     if (!footerContainer) return;
@@ -27,6 +76,7 @@ function generaFooter() {
                     <div class="quick-links">
                         <a href="books.html"><i class="fas fa-book-open"></i> &nbsp; Books I have Read</a>
                         <a href="redbull.html"><i class="fas fa-mountain"></i> &nbsp; Redbull Ivy images</a>
+                        <a href="projects.html"><i class="fas fa-rocket"></i> &nbsp; Projects</a>
                     </div>
                 </div>
                 <div class="footer-section contact-form">
@@ -51,5 +101,12 @@ function generaFooter() {
     `;
 }
 
-// Avvia la funzione non appena la pagina ha finito di caricare
-document.addEventListener('DOMContentLoaded', generaFooter);
+// ---- Shared init (runs on every page) ----
+// Pages set <nav id="navbar-container" data-page="Home"></nav> for auto-navbar.
+// Pages that need specific init can add their own DOMContentLoaded listener.
+// main.js runs first, so navbar + footer are ready before page-specific scripts.
+document.addEventListener('DOMContentLoaded', () => {
+    const nav = document.getElementById('navbar-container');
+    if (nav) generaNavbar(nav.dataset.page || '');
+    generaFooter();
+});

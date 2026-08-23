@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paolo's Life Blog — Projects</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="shortcut icon" href="images/profile.png" type="image/x-icon"/>
+</head>
+
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Q9Q2REB32Z"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-Q9Q2REB32Z');
+</script>
+
+<body>
+    <nav id="navbar-container" data-page="Progetti"></nav>
+
+    <section class="projects-page">
+        <div class="container">
+            <div class="projects-header">
+                <h1>Progetti</h1>
+                <p>Aggiornamenti sui miei progetti — filtra per categoria</p>
+            </div>
+
+            <div class="projects-tabs">
+                <button class="tab active" data-filter="all">Tutti</button>
+                <button class="tab" data-filter="Elettronica">Elettronica</button>
+                <button class="tab" data-filter="Informatica">Informatica</button>
+                <button class="tab" data-filter="AI">AI</button>
+            </div>
+
+            <div id="projects-container">
+                <p style="text-align: center; padding: 20px;">Loading projects…</p>
+            </div>
+        </div>
+    </section>
+
+    <div class="page-wrapper"></div>
+    <div id="footer-condiviso"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/projects.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
