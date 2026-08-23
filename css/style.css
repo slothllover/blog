@@ -865,6 +865,13 @@ todo.html
     border-color: #1e3a1e;
 }
 
+/* X indicator on active subcategory tabs (not Tutti) */
+.projects-tabs .tab.active[data-filter]:not([data-filter="all"])::after {
+    content: " ×";
+    font-size: 11px;
+    opacity: 0.7;
+}
+
 /* Project card badge */
 
 .project-badge {

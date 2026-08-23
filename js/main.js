@@ -69,6 +69,7 @@ function generaFooter() {
                         <a target="_blank" href="https://www.instagram.com/paolo_cimenti/"><i class="fab fa-instagram"></i></a>
                         <a target="_blank" href="https://twitter.com/DueQWERY"><i class="fab fa-twitter"></i></a>
                         <a target="_blank" href="https://github.com/DueQWERY"><i class="fab fa-github"></i></a>
+                        <a target="_blank" href="https://www.linkedin.com/in/paolo-cimenti-07b449285"><i class="fab fa-linkedin"></i></a>
                     </div>
                 </div>
                 <div class="footer-section links">

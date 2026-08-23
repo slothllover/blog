@@ -1,5 +1,5 @@
 // ============================================================
-// admin.js — Pannello Admin unificato per paoloslife.com
+// admin.js — Pannello Admin unificato per paolocimenti.com
 // ============================================================
 
 const SUPABASE_URL = "https://rylrgyqvabgtvcjwidqg.supabase.co";
@@ -17,6 +17,19 @@ const LAYOUTS = {
     "three-big-bottom": { count: 3, labels: ["Immagine grande (sotto)", "Piccola 1 (sopra sinistra)", "Piccola 2 (sopra destra)"] },
     "four-grid":        { count: 4, labels: ["Immagine 1 (alto sinistra)", "Immagine 2 (alto destra)", "Immagine 3 (basso sinistra)", "Immagine 4 (basso destra)"] }
 };
+
+// ---- Helpers ----
+function getSubcategories() {
+    const boxes = document.querySelectorAll('input[name="subcat"]:checked');
+    return Array.from(boxes).map(cb => cb.value);
+}
+
+function setSubcategories(values) {
+    const arr = Array.isArray(values) ? values : (values ? [values] : []);
+    document.querySelectorAll('input[name="subcat"]').forEach(cb => {
+        cb.checked = arr.includes(cb.value);
+    });
+}
 
 // ============================================================
 // 1. AUTH
@@ -61,13 +74,10 @@ document.getElementById('logout-btn').addEventListener('click', async () => {
 
 document.querySelectorAll('.admin-tab[data-tab]').forEach(tab => {
     tab.addEventListener('click', () => {
-        // Update active tab
         document.querySelectorAll('.admin-tab[data-tab]').forEach(t => t.classList.remove('active'));
         tab.classList.add('active');
-        // Show the right content
         document.querySelectorAll('.admin-tab-content').forEach(tc => tc.classList.remove('active'));
         document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
-        // Load post list when switching to manage-posts
         if (tab.dataset.tab === 'manage-posts') loadPostList();
     });
 });
@@ -80,30 +90,24 @@ const categorySelect = document.getElementById('category');
 const subcategoryGroup = document.getElementById('subcategory-group');
 
 categorySelect.addEventListener('change', () => {
-    if (categorySelect.value === 'projects') {
-        subcategoryGroup.style.display = 'block';
-    } else {
-        subcategoryGroup.style.display = 'none';
-    }
+    subcategoryGroup.style.display = categorySelect.value === 'projects' ? 'block' : 'none';
 });
 
 // ============================================================
-// 4. IMAGE SLOTS (dinamici in base al layout)
+// 4. IMAGE SLOTS
 // ============================================================
 
 function aggiornaSlotImmagini() {
     const select = document.getElementById('layout');
     const container = document.getElementById('image-slots');
     if (!select || !container) return;
-    const layout = select.value;
-    const cfg = LAYOUTS[layout] || LAYOUTS["single"];
+    const cfg = LAYOUTS[select.value] || LAYOUTS["single"];
     let html = '';
     for (let i = 0; i < cfg.count; i++) {
-        html += `
-            <div class="admin-form-group">
-                <label for="image-${i}">${cfg.labels[i]}</label>
-                <input type="file" id="image-${i}" accept="image/*">
-            </div>`;
+        html += `<div class="admin-form-group">
+            <label for="image-${i}">${cfg.labels[i]}</label>
+            <input type="file" id="image-${i}" accept="image/*">
+        </div>`;
     }
     container.innerHTML = html;
 }
@@ -116,17 +120,15 @@ aggiornaSlotImmagini();
 // ============================================================
 
 async function uploadToCloudinary(file) {
-    const CLOUD_NAME = "dx1hcvhht";
-    const UPLOAD_PRESET = "blog-uploads";
     const formData = new FormData();
     formData.append('file', file);
-    formData.append('upload_preset', UPLOAD_PRESET);
-    const resp = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`, {
+    formData.append('upload_preset', 'blog-uploads');
+    const resp = await fetch('https://api.cloudinary.com/v1_1/dx1hcvhht/image/upload', {
         method: 'POST', body: formData
     });
     const data = await resp.json();
     if (data.secure_url) return data.secure_url;
-    throw new Error(data.error?.message || "Errore Cloudinary");
+    throw new Error(data.error?.message || 'Errore Cloudinary');
 }
 
 // ============================================================
@@ -141,7 +143,7 @@ submitBtn.addEventListener('click', async () => {
     const titleInput = document.getElementById('title').value.trim();
     const contentInput = document.getElementById('content').innerHTML.trim();
     const categoryInput = document.getElementById('category').value;
-    const subcategoryInput = document.getElementById('subcategory').value;
+    const subcategoriesArray = getSubcategories();
     const layoutInput = document.getElementById('layout').value;
     const cfg = LAYOUTS[layoutInput] || LAYOUTS["single"];
 
@@ -153,7 +155,6 @@ submitBtn.addEventListener('click', async () => {
     let immagineFinale = "";
     let galleriaFinale = null;
 
-    // Raccogli file
     const files = [];
     for (let i = 0; i < cfg.count; i++) {
         const el = document.getElementById('image-' + i);
@@ -200,18 +201,15 @@ submitBtn.addEventListener('click', async () => {
         contenuto: contentInput,
         categoria: categoryInput,
     };
-
     if (immagineFinale) record.immagine = immagineFinale;
     if (galleriaFinale) record.galleria = galleriaFinale;
-    if (categoryInput === 'projects') record.sottocategoria = subcategoryInput;
+    if (categoryInput === 'projects') record.sottocategoria = subcategoriesArray;
 
     let error;
     if (editId) {
-        // UPDATE existing post
         const { error: err } = await db.from('posts').update(record).eq('id', editId);
         error = err;
     } else {
-        // INSERT new post
         const { error: err } = await db.from('posts').insert([record]);
         error = err;
     }
@@ -238,7 +236,7 @@ function clearForm() {
     document.getElementById('title').value = '';
     document.getElementById('content').innerHTML = '';
     document.getElementById('category').value = 'blog';
-    document.getElementById('subcategory').value = 'Elettronica';
+    setSubcategories([]);
     document.getElementById('layout').value = 'single';
     subcategoryGroup.style.display = 'none';
     aggiornaSlotImmagini();
@@ -251,25 +249,17 @@ function clearForm() {
 document.getElementById('clear-form-btn').addEventListener('click', clearForm);
 
 // ============================================================
-// 8. LOAD POST LIST (tab "I Miei Post")
+// 8. LOAD POST LIST
 // ============================================================
 
 async function loadPostList() {
     const container = document.getElementById('post-list');
     if (!container) return;
-
     container.innerHTML = '<p style="text-align:center; color:#999; padding:30px;">Caricamento…</p>';
 
-    const { data, error } = await db
-        .from('posts')
-        .select('*')
-        .order('created_at', { ascending: false });
+    const { data, error } = await db.from('posts').select('*').order('created_at', { ascending: false });
 
-    if (error) {
-        container.innerHTML = `<p style="color:red;">Errore: ${error.message}</p>`;
-        return;
-    }
-
+    if (error) { container.innerHTML = `<p style="color:red;">Errore: ${error.message}</p>`; return; }
     if (!data || data.length === 0) {
         container.innerHTML = `<p style="text-align:center; color:#666; padding:30px;">Nessun post trovato.</p>`;
         return;
@@ -278,23 +268,19 @@ async function loadPostList() {
     const catLabels = { blog: 'Blog', books: 'Libri', projects: 'Progetti' };
 
     let html = `<table class="admin-post-list">
-        <thead><tr>
-            <th>Titolo</th><th>Categoria</th><th>Data</th><th style="width:120px;">Azioni</th>
-        </tr></thead><tbody>`;
+        <thead><tr><th>Titolo</th><th>Categoria</th><th>Data</th><th style="width:120px;">Azioni</th></tr></thead><tbody>`;
 
     data.forEach(post => {
         const cat = post.categoria || 'blog';
-        const sub = post.sottocategoria || '';
-        const date = new Date(post.created_at).toLocaleDateString('it-IT', {
-            day: '2-digit', month: 'short', year: 'numeric'
-        });
+        const subs = Array.isArray(post.sottocategoria) ? post.sottocategoria : (post.sottocategoria ? [post.sottocategoria] : []);
+        const date = new Date(post.created_at).toLocaleDateString('it-IT', { day: '2-digit', month: 'short', year: 'numeric' });
         const title = post.titolo || '(senza titolo)';
+        const subBadges = subs.map(s => `<span class="admin-sub-badge ${s}">${s}</span>`).join('');
 
         html += `<tr>
             <td class="post-title-cell" title="${title.replace(/"/g,'&quot;')}">${title}</td>
             <td>
-                <span class="admin-cat-badge ${cat}">${catLabels[cat] || cat}</span>
-                ${sub ? `<span class="admin-sub-badge ${sub}">${sub}</span>` : ''}
+                <span class="admin-cat-badge ${cat}">${catLabels[cat] || cat}</span>${subBadges}
             </td>
             <td>${date}</td>
             <td>
@@ -315,20 +301,18 @@ async function loadPostList() {
 document.getElementById('refresh-posts-btn').addEventListener('click', loadPostList);
 
 // ============================================================
-// 9. EDIT POST (loads into form)
+// 9. EDIT POST
 // ============================================================
 
 async function editPost(id) {
     const { data, error } = await db.from('posts').select('*').eq('id', id).single();
     if (error) { alert("Errore: " + error.message); return; }
 
-    // Switch to "Scrivi Post" tab
     document.querySelectorAll('.admin-tab[data-tab]').forEach(t => t.classList.remove('active'));
     document.querySelector('.admin-tab[data-tab="new-post"]').classList.add('active');
     document.querySelectorAll('.admin-tab-content').forEach(tc => tc.classList.remove('active'));
     document.getElementById('tab-new-post').classList.add('active');
 
-    // Fill form
     document.getElementById('edit-id').value = data.id;
     document.getElementById('title').value = data.titolo || '';
     document.getElementById('content').innerHTML = data.contenuto || '';
@@ -336,7 +320,7 @@ async function editPost(id) {
 
     if (data.categoria === 'projects') {
         subcategoryGroup.style.display = 'block';
-        document.getElementById('subcategory').value = data.sottocategoria || 'Elettronica';
+        setSubcategories(data.sottocategoria);
     } else {
         subcategoryGroup.style.display = 'none';
     }
@@ -348,8 +332,6 @@ async function editPost(id) {
     document.getElementById('form-mode-hint').innerText = 'Stai modificando un post esistente. Le immagini vanno ricaricate solo se vuoi cambiarle.';
     document.getElementById('clear-form-btn').style.display = 'inline-block';
     formStatus.innerHTML = '';
-
-    // Scroll to form
     document.getElementById('tab-new-post').scrollIntoView({ behavior: 'smooth' });
 }
 
@@ -359,7 +341,6 @@ async function editPost(id) {
 
 async function deletePost(id) {
     if (!confirm("Sei sicuro di voler eliminare questo post? L'operazione è irreversibile.")) return;
-
     const { error } = await db.from('posts').delete().eq('id', id);
     if (error) {
         alert("Errore: " + error.message);
@@ -369,7 +350,7 @@ async function deletePost(id) {
 }
 
 // ============================================================
-// INIT: load post list after login
+// INIT
 // ============================================================
 (async () => {
     const logged = await checkSession();

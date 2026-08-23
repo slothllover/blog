@@ -7,18 +7,46 @@ const SUPABASE_KEY = "sb_publishable_ltI-p9eQ9K9zfUDwRnwAlg_aThQgZvP";
 const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 let allProjects = [];
-let currentFilter = 'all';
+let activeFilters = new Set(); // empty = "all"
 
-// ---- Tab switching ----
+// ---- Tab switching (multi-select) ----
 function setupTabs() {
+    const tabs = document.querySelectorAll('.projects-tabs');
+
+    document.querySelector('.projects-tabs').addEventListener('click', (e) => {
+        const tab = e.target.closest('.tab');
+        if (!tab) return;
+
+        const filter = tab.dataset.filter;
+
+        if (filter === 'all') {
+            // Click su "Tutti": deseleziona tutto
+            activeFilters.clear();
+            updateTabUI();
+        } else {
+            // Toggle this filter
+            if (activeFilters.has(filter)) {
+                activeFilters.delete(filter);
+            } else {
+                // Rimuovi "all" quando si seleziona qualcosa
+                activeFilters.add(filter);
+            }
+            updateTabUI();
+        }
+
+        renderProjects();
+    });
+}
+
+function updateTabUI() {
     const tabs = document.querySelectorAll('.projects-tabs .tab');
     tabs.forEach(tab => {
-        tab.addEventListener('click', () => {
-            tabs.forEach(t => t.classList.remove('active'));
-            tab.classList.add('active');
-            currentFilter = tab.dataset.filter;
-            renderProjects();
-        });
+        const f = tab.dataset.filter;
+        if (f === 'all') {
+            tab.classList.toggle('active', activeFilters.size === 0);
+        } else {
+            tab.classList.toggle('active', activeFilters.has(f));
+        }
     });
 }
 
@@ -67,16 +95,21 @@ function renderProjects() {
     const container = document.getElementById('projects-container');
     if (!container) return;
 
-    const filtered = currentFilter === 'all'
+    const filtered = activeFilters.size === 0
         ? allProjects
-        : allProjects.filter(p => p.sottocategoria === currentFilter);
+        : allProjects.filter(p => {
+            const subs = Array.isArray(p.sottocategoria)
+                ? p.sottocategoria
+                : (p.sottocategoria ? [p.sottocategoria] : []);
+            return subs.some(s => activeFilters.has(s));
+        });
 
     if (filtered.length === 0) {
         container.innerHTML = `
             <section class="hero">
                 <div class="container">
                     <p style="text-align: center; padding: 40px 20px; color: #666;">
-                        Nessun progetto in questa categoria.
+                        Nessun progetto con i filtri selezionati.
                     </p>
                 </div>
             </section>`;
@@ -86,8 +119,16 @@ function renderProjects() {
     container.innerHTML = '';
 
     filtered.forEach(project => {
-        const sub = project.sottocategoria || '';
-        const subClass = sub.toLowerCase();
+        // Normalizza sottocategoria: può essere array o stringa
+        const subs = Array.isArray(project.sottocategoria)
+            ? project.sottocategoria
+            : (project.sottocategoria ? [project.sottocategoria] : []);
+
+        // Un badge per ogni sottocategoria
+        const badges = subs.map(sub => {
+            const subClass = sub.toLowerCase();
+            return `<span class="project-badge ${subClass}">${sub}</span>`;
+        }).join('');
 
         // Single image
         let tagImmagine = '';
@@ -111,7 +152,7 @@ function renderProjects() {
         const postHTML = `
             <section class="hero">
                 <div class="container">
-                    ${sub ? `<span class="project-badge ${subClass}">${sub}</span>` : ''}
+                    ${badges}
                     <div class="heading">
                         <h1 class="title">${project.titolo}</h1>
                         <p class="date-time">${dataOra}</p>
