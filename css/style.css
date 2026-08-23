@@ -1207,22 +1207,23 @@ todo.html
         font-size: 14px;
     }
 
-    /* Hero / cards — single column */
+    /* Hero / cards — single column, image first */
     .hero .container .content {
         grid-template-columns: 1fr;
     }
 
-    .hero .container .content img {
+    .hero .container .content > div {
+        order: 2;
+    }
+
+    .hero .container .content > img,
+    .hero .container .content > .gallery {
+        order: 1;
         width: 100%;
         max-width: 100%;
         padding: 0;
-        margin-top: 10px;
-    }
-
-    .hero .container .content .gallery {
-        width: 100%;
-        max-width: 100%;
-        margin-top: 10px;
+        margin-top: 0;
+        margin-bottom: 12px;
     }
 
     /* Header: title + date stacked */
@@ -1256,6 +1257,7 @@ todo.html
         height: auto;
         border-top-left-radius: 14px;
         border-top-right-radius: 14px;
+        overflow: hidden;
     }
 
     .footer .footer-content {
@@ -1269,9 +1271,14 @@ todo.html
 
     .footer .footer-bottom {
         position: relative;
+        width: 100%;
         height: auto;
-        padding: 12px 15px;
-        font-size: 13px;
+        min-height: 40px;
+        padding: 10px 15px;
+        font-size: 12px;
+        line-height: 1.4;
+        word-break: break-word;
+        box-sizing: border-box;
     }
 
     /* About Me: intro stacks */

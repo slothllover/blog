@@ -62,7 +62,7 @@ function generaFooter() {
                         wait to see where this project goes!
                     </p>
                     <div class="contact">
-                        <span><i class="fas fa-envelope"></i> &nbsp; paoloslifeblog@gmail.com</span>
+                        <span><i class="fas fa-envelope"></i> &nbsp; cimentipaolo07@gmail.com</span>
                     </div>
                     <div class="socials">
                         <a target="_blank" href="https://www.facebook.com/paolo_cimenti/"><i class="fab fa-facebook"></i></a>
