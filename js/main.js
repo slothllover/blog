@@ -1,5 +1,5 @@
 // ============================================================
-// main.js — Shared components for paoloslife.com
+// main.js — Shared components for paolocimenti.com
 // ============================================================
 
 // ---- Navbar (shared across all pages) ----
