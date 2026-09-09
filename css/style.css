@@ -800,38 +800,42 @@ todo.html
    Projects Page
    ============================================================ */
 
-.projects-page {
+.projects-page,
+.blog-page {
     margin: 20px auto;
-    background: #ffffff;
     max-width: 1200px;
-    border-radius: 20px;
     text-align: left;
 }
 
-.projects-page .container {
+.projects-page .container,
+.blog-page .container {
     padding: 20px;
     width: 100%;
 }
 
-.projects-header {
+.projects-header,
+.blog-header {
     text-align: center;
     padding-bottom: 10px;
 }
 
-.projects-header h1 {
+.projects-header h1,
+.blog-header h1 {
     font-size: 2rem;
     color: #313131;
     margin-bottom: 4px;
 }
 
-.projects-header p {
+.projects-header p,
+.blog-header p {
     color: #666;
     font-size: 0.95rem;
 }
 
-/* Filter tabs */
+/* Filter tabs (projects + blog) */
 
-.projects-tabs {
+.projects-tabs,
+.blog-tabs {
     display: flex;
     gap: 8px;
     justify-content: center;
@@ -841,7 +845,8 @@ todo.html
     margin-bottom: 20px;
 }
 
-.projects-tabs .tab {
+.projects-tabs .tab,
+.blog-tabs .tab {
     padding: 8px 18px;
     border: 2px solid #ccc;
     border-radius: 20px;
@@ -854,19 +859,22 @@ todo.html
     color: #555;
 }
 
-.projects-tabs .tab:hover {
+.projects-tabs .tab:hover,
+.blog-tabs .tab:hover {
     border-color: #1e3a1e;
     color: #1e3a1e;
 }
 
-.projects-tabs .tab.active {
+.projects-tabs .tab.active,
+.blog-tabs .tab.active {
     background: #1e3a1e;
     color: white;
     border-color: #1e3a1e;
 }
 
 /* X indicator on active subcategory tabs (not Tutti) */
-.projects-tabs .tab.active[data-filter]:not([data-filter="all"])::after {
+.projects-tabs .tab.active[data-filter]:not([data-filter="all"])::after,
+.blog-tabs .tab.active[data-filter]:not([data-filter="all"])::after {
     content: " ×";
     font-size: 11px;
     opacity: 0.7;
@@ -899,6 +907,15 @@ todo.html
     background: #e8ccff;
     color: #5c009a;
 }
+
+/* Blog category badges */
+.project-badge.sport     { background: #ffe0cc; color: #9a4d00; }
+.project-badge.viaggi    { background: #cce5ff; color: #004e9a; }
+.project-badge.everyday  { background: #e8f5e9; color: #2e7d32; }
+.project-badge.tech      { background: #e3f2fd; color: #1565c0; }
+.project-badge.musica    { background: #fce4ec; color: #c62828; }
+.project-badge.eventi    { background: #f3e5f5; color: #7b1fa2; }
+.project-badge.scuola    { background: #fff9c4; color: #827717; }
 
 /* ============================================================
    Admin Panel
@@ -1185,6 +1202,15 @@ todo.html
 .admin-sub-badge.Informatica   { background: #cce5ff; color: #004e9a; }
 .admin-sub-badge.AI            { background: #e8ccff; color: #5c009a; }
 
+/* Blog subcategories in admin list */
+.admin-sub-badge.Sport     { background: #ffe0cc; color: #9a4d00; }
+.admin-sub-badge.Viaggi    { background: #cce5ff; color: #004e9a; }
+.admin-sub-badge.Everyday  { background: #e8f5e9; color: #2e7d32; }
+.admin-sub-badge.Tech      { background: #e3f2fd; color: #1565c0; }
+.admin-sub-badge.Musica    { background: #fce4ec; color: #c62828; }
+.admin-sub-badge.Eventi    { background: #f3e5f5; color: #7b1fa2; }
+.admin-sub-badge.Scuola    { background: #fff9c4; color: #827717; }
+
 /* ============================================================
    RESPONSIVE — Mobile & Tablet
    ============================================================ */
@@ -1302,17 +1328,20 @@ todo.html
         margin: 0;
     }
 
-    /* Projects page tabs */
-    .projects-tabs {
+    /* Projects/Blog page tabs */
+    .projects-tabs,
+    .blog-tabs {
         gap: 6px;
     }
 
-    .projects-tabs .tab {
+    .projects-tabs .tab,
+    .blog-tabs .tab {
         padding: 6px 14px;
         font-size: 13px;
     }
 
-    .projects-header h1 {
+    .projects-header h1,
+    .blog-header h1 {
         font-size: 1.5rem;
     }
 
@@ -1390,7 +1419,8 @@ todo.html
     .whoami,
     .projects,
     .contactme,
-    .projects-page {
+    .projects-page,
+    .blog-page {
         border-radius: 12px;
         margin: 12px 8px;
     }
@@ -1431,13 +1461,15 @@ todo.html
         grid-template-rows: auto !important;
     }
 
-    /* Projects page: smaller tabs */
-    .projects-tabs {
+    /* Projects/Blog page: smaller tabs */
+    .projects-tabs,
+    .blog-tabs {
         gap: 4px;
         padding: 8px 0 14px;
     }
 
-    .projects-tabs .tab {
+    .projects-tabs .tab,
+    .blog-tabs .tab {
         padding: 5px 12px;
         font-size: 12px;
     }

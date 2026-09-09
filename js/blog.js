@@ -3,6 +3,48 @@ const SUPABASE_URL = "https://rylrgyqvabgtvcjwidqg.supabase.co";
 const SUPABASE_KEY = "sb_publishable_ltI-p9eQ9K9zfUDwRnwAlg_aThQgZvP"; 
 const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+let allPosts = [];
+let activeFilters = new Set(); // empty = "all"
+
+// ---- Tab switching (multi-select) ----
+function setupBlogTabs() {
+    const tabsContainer = document.querySelector('.blog-tabs');
+    if (!tabsContainer) return;
+
+    tabsContainer.addEventListener('click', (e) => {
+        const tab = e.target.closest('.tab');
+        if (!tab) return;
+
+        const filter = tab.dataset.filter;
+
+        if (filter === 'all') {
+            activeFilters.clear();
+            updateBlogTabUI();
+        } else {
+            if (activeFilters.has(filter)) {
+                activeFilters.delete(filter);
+            } else {
+                activeFilters.add(filter);
+            }
+            updateBlogTabUI();
+        }
+
+        renderPosts();
+    });
+}
+
+function updateBlogTabUI() {
+    const tabs = document.querySelectorAll('.blog-tabs .tab');
+    tabs.forEach(tab => {
+        const f = tab.dataset.filter;
+        if (f === 'all') {
+            tab.classList.toggle('active', activeFilters.size === 0);
+        } else {
+            tab.classList.toggle('active', activeFilters.has(f));
+        }
+    });
+}
+
 // 2. Funzione principale per recuperare e mostrare i post
 async function caricaPost() {
     const container = document.getElementById('blog-container');
@@ -39,11 +81,47 @@ async function caricaPost() {
         return;
     }
 
-    // Svuotiamo il contenitore dal messaggio di "Caricamento in corso..."
-    container.innerHTML = "";
+    allPosts = posts;
+    renderPosts();
+}
 
-    // 3. Cicliamo tutti i post ricevuti e generiamo l'HTML con la tua grafica originale
-    posts.forEach(post => {
+// ---- Render filtered posts ----
+function renderPosts() {
+    const container = document.getElementById('blog-container');
+    if (!container) return;
+
+    const filtered = activeFilters.size === 0
+        ? allPosts
+        : allPosts.filter(p => {
+            const subs = Array.isArray(p.sottocategoria)
+                ? p.sottocategoria
+                : (p.sottocategoria ? [p.sottocategoria] : []);
+            return subs.some(s => activeFilters.has(s));
+        });
+
+    if (filtered.length === 0) {
+        container.innerHTML = `
+            <p style="text-align: center; padding: 40px 20px; color: #666;">
+                Nessun articolo con i filtri selezionati.
+            </p>`;
+        return;
+    }
+
+    container.innerHTML = '';
+
+    // 3. Cicliamo tutti i post filtrati e generiamo l'HTML
+    filtered.forEach(post => {
+        // Normalizza sottocategoria
+        const subs = Array.isArray(post.sottocategoria)
+            ? post.sottocategoria
+            : (post.sottocategoria ? [post.sottocategoria] : []);
+
+        // Badge per ogni sottocategoria
+        const badges = subs.map(sub => {
+            const subClass = sub.toLowerCase();
+            return `<span class="project-badge ${subClass}">${sub}</span>`;
+        }).join('');
+
         // Ottimizzazione Cloudinary al volo (lascia invariati i link non-Cloudinary)
         const ottimizzaUrl = (url) => {
             if (url && url.includes("cloudinary.com")) {
@@ -52,7 +130,7 @@ async function caricaPost() {
             return url;
         };
 
-        // Blocco immagini: galleria multi-immagine (nuovo) oppure singola immagine (comportamento attuale)
+        // Blocco immagini: galleria multi-immagine oppure singola immagine
         let tagImmagine = "";
 
         // 1) Galleria multi-immagine (colonna 'galleria')
@@ -70,7 +148,7 @@ async function caricaPost() {
             tagImmagine = `<img src="${ottimizzaUrl(post.immagine)}" alt="Copertina">`;
         }
 
-// Formattiamo la data includendo ora e minuti (formato 24 ore)
+        // Formattiamo la data
         const dataFormattata = new Date(post.created_at).toLocaleDateString('en-US', {
             day: 'numeric',
             month: 'long',
@@ -83,13 +161,13 @@ async function caricaPost() {
             timeZone: 'Europe/Rome'
         });
 
-        // Uniamo data e ora con un trattino (es: "May 30, 2024 - 08:15")
         const dataEOraCompleta = `${dataFormattata} - ${oraFormattata}`;
 
-        // Generiamo la struttura identica alle tue vecchie sezioni statiche
+        // Generiamo la struttura HTML
         const postHTML = `
             <section class="hero">
                 <div class="container">
+                    ${badges}
                     <div class="heading">
                         <h1 class="title">${post.titolo}</h1>
                         <p class="date-time">${dataEOraCompleta}</p>
@@ -105,10 +183,10 @@ async function caricaPost() {
             </section>
         `;
 
-        // Iniettiamo il post nel contenitore principale della pagina
         container.innerHTML += postHTML;
     });
 }
 
-// 4. Avviamo la funzione automaticamente al caricamento della pagina
+// 4. Avviamo
+setupBlogTabs();
 caricaPost();

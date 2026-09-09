@@ -26,15 +26,30 @@
 <body>
     <nav id="navbar-container" data-page="Home"></nav>
 
-    <!-- Blogs -->
+    <!-- Blog Category Tabs -->
+    <section class="blog-page">
+        <div class="container">
+            <div class="blog-header">
+                <h1>Blog</h1>
+                <p>I miei articoli — filtra per categoria</p>
+            </div>
 
-    <div id="blog-container">
-        <section class="hero">
-            <div class="container">
+            <div class="blog-tabs">
+                <button class="tab active" data-filter="all">Tutti</button>
+                <button class="tab" data-filter="Sport">Sport</button>
+                <button class="tab" data-filter="Viaggi">Viaggi</button>
+                <button class="tab" data-filter="Everyday">Everyday</button>
+                <button class="tab" data-filter="Tech">Tech</button>
+                <button class="tab" data-filter="Musica">Musica</button>
+                <button class="tab" data-filter="Eventi">Eventi</button>
+                <button class="tab" data-filter="Scuola">Scuola</button>
+            </div>
+
+            <div id="blog-container">
                 <p style="text-align: center; padding: 20px;">Loading articles...</p>
             </div>
-        </section>
-    </div>
+        </div>
+    </section>
 
     <!-- Page Wrapper -->
     <div class="page-wrapper"></div>

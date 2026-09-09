@@ -19,6 +19,30 @@ const LAYOUTS = {
 };
 
 // ---- Helpers ----
+
+// Categorie disponibili per ogni tipo di post
+const CATEGORY_SUBCATEGORIES = {
+    blog: ['Sport', 'Viaggi', 'Everyday', 'Tech', 'Musica', 'Eventi', 'Scuola'],
+    projects: ['Elettronica', 'Informatica', 'AI'],
+    books: []
+};
+
+// Colori badge per ogni sottocategoria (usati anche nella home)
+const SUBCATEGORY_COLORS = {
+    // Blog
+    'Sport':       { bg: '#ffe0cc', color: '#9a4d00' },
+    'Viaggi':      { bg: '#cce5ff', color: '#004e9a' },
+    'Everyday':    { bg: '#e8f5e9', color: '#2e7d32' },
+    'Tech':        { bg: '#e3f2fd', color: '#1565c0' },
+    'Musica':      { bg: '#fce4ec', color: '#c62828' },
+    'Eventi':      { bg: '#f3e5f5', color: '#7b1fa2' },
+    'Scuola':      { bg: '#fff9c4', color: '#827717' },
+    // Projects
+    'Elettronica': { bg: '#fff0cc', color: '#9a6e00' },
+    'Informatica': { bg: '#cce5ff', color: '#004e9a' },
+    'AI':          { bg: '#e8ccff', color: '#5c009a' }
+};
+
 function getSubcategories() {
     const boxes = document.querySelectorAll('input[name="subcat"]:checked');
     return Array.from(boxes).map(cb => cb.value);
@@ -29,6 +53,21 @@ function setSubcategories(values) {
     document.querySelectorAll('input[name="subcat"]').forEach(cb => {
         cb.checked = arr.includes(cb.value);
     });
+}
+
+function renderSubcategoryCheckboxes(category) {
+    const container = document.getElementById('subcategory-checkboxes');
+    if (!container) return;
+    const subs = CATEGORY_SUBCATEGORIES[category] || [];
+    if (subs.length === 0) {
+        container.innerHTML = '';
+        return;
+    }
+    container.innerHTML = subs.map(sub =>
+        `<label class="checkbox-label">
+            <input type="checkbox" name="subcat" value="${sub}"> ${sub}
+        </label>`
+    ).join('');
 }
 
 // ============================================================
@@ -90,7 +129,14 @@ const categorySelect = document.getElementById('category');
 const subcategoryGroup = document.getElementById('subcategory-group');
 
 categorySelect.addEventListener('change', () => {
-    subcategoryGroup.style.display = categorySelect.value === 'projects' ? 'block' : 'none';
+    const cat = categorySelect.value;
+    const subsExist = (CATEGORY_SUBCATEGORIES[cat] || []).length > 0;
+    if (subsExist) {
+        subcategoryGroup.style.display = 'block';
+        renderSubcategoryCheckboxes(cat);
+    } else {
+        subcategoryGroup.style.display = 'none';
+    }
 });
 
 // ============================================================
@@ -203,7 +249,7 @@ submitBtn.addEventListener('click', async () => {
     };
     if (immagineFinale) record.immagine = immagineFinale;
     if (galleriaFinale) record.galleria = galleriaFinale;
-    if (categoryInput === 'projects') record.sottocategoria = subcategoriesArray;
+    if (categoryInput === 'projects' || categoryInput === 'blog') record.sottocategoria = subcategoriesArray;
 
     let error;
     if (editId) {
@@ -238,7 +284,8 @@ function clearForm() {
     document.getElementById('category').value = 'blog';
     setSubcategories([]);
     document.getElementById('layout').value = 'single';
-    subcategoryGroup.style.display = 'none';
+    renderSubcategoryCheckboxes('blog');
+    subcategoryGroup.style.display = 'block';
     aggiornaSlotImmagini();
     document.getElementById('form-mode-title').innerText = 'Nuovo articolo';
     document.getElementById('form-mode-hint').innerText = 'Compila il form qui sotto per pubblicare un post. Scegli la destinazione in base al tipo di contenuto.';
@@ -318,7 +365,8 @@ async function editPost(id) {
     document.getElementById('content').innerHTML = data.contenuto || '';
     document.getElementById('category').value = data.categoria || 'blog';
 
-    if (data.categoria === 'projects') {
+    if (data.categoria === 'projects' || data.categoria === 'blog') {
+        renderSubcategoryCheckboxes(data.categoria);
         subcategoryGroup.style.display = 'block';
         setSubcategories(data.sottocategoria);
     } else {
