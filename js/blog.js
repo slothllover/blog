@@ -5,6 +5,7 @@ const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 let allPosts = [];
 let activeFilters = new Set(); // empty = "all"
+let leggiCommenti = {};
 
 // ---- Tab switching (multi-select) ----
 function setupBlogTabs() {
@@ -82,7 +83,28 @@ async function caricaPost() {
     }
 
     allPosts = posts;
+    await caricaConteggiCommenti();
     renderPosts();
+}
+
+// ---- Conteggio commenti per post (per il link "Commenti (N)") ----
+async function caricaConteggiCommenti() {
+    // Scarichiamo SOLO la colonna post_id: il conteggio lo facciamo nel browser,
+    // con una sola query per tutta la pagina (anche la policy RLS consente la lettura)
+    const { data, error } = await db
+        .from('comments')
+        .select('post_id');
+
+    if (error) {
+        console.error("Errore nel conteggio commenti:", error);
+        return;
+    }
+
+    conteggiCommenti = {};
+    data.forEach(c => {
+        // Trick comodo: se la chiave non esiste è undefined → "|| 0" la porta a 0
+        conteggiCommenti[c.post_id] = (conteggiCommenti[c.post_id] || 0) + 1;
+    });
 }
 
 // ---- Render filtered posts ----
@@ -115,6 +137,8 @@ function renderPosts() {
         const subs = Array.isArray(post.sottocategoria)
             ? post.sottocategoria
             : (post.sottocategoria ? [post.sottocategoria] : []);
+        // Badge in ordine alfabetico (anche per i post scritti prima delle nuove liste)
+        subs.sort((a, b) => a.localeCompare(b, 'it'));
 
         // Badge per ogni sottocategoria
         const badges = subs.map(sub => {
@@ -165,26 +189,35 @@ function renderPosts() {
 
         // Generiamo la struttura HTML
         const postHTML = `
-            <section class="hero">
-                <div class="container">
-                    ${badges}
-                    <div class="heading">
-                        <h1 class="title">${post.titolo}</h1>
-                        <p class="date-time">${dataEOraCompleta}</p>
-                    </div>
-                    
-                    <div class="content">
-                        <div>
-                            <p>${post.contenuto.replace(/\n/g, '<br>')}</p>
-                        </div>
-                        ${tagImmagine}
-                    </div>
-                </div>
-            </section>
+               <section class="hero">
+                   <div class="container">
+                       ${badges}
+                       <div class="heading">
+                           <h1 class="title"><a class="post-title-link" href="post.html?id=${post.id}">${post.titolo}</a></h1>
+                           <p class="date-time">${dataEOraCompleta}</p>
+                       </div>
+
+                       <div class="content">
+                           <div>
+                               <p>${post.contenuto.replace(/\n/g, '<br>')}</p>
+                           </div>
+                           ${tagImmagine}
+                       </div>
+
+                       <div class="comments-link-wrap">
+                           <a class="post-comments-link" href="post.html?id=${post.id}">
+                               <i class="fas fa-comment-dots"></i> Commenti (${conteggiCommenti[post.id] || 0})
+                           </a>
+                       </div>
+                   </div>
+               </section>
         `;
 
         container.innerHTML += postHTML;
     });
+
+    // I link dentro il contenuto si aprono in una nuova scheda
+    rendiLinkEsterni(container);
 }
 
 // 4. Avviamo

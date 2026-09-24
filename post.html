@@ -1,0 +1,95 @@
+   <!DOCTYPE html>
+   <html lang="it">
+   <head>
+       <meta charset="UTF-8">
+       <meta name="viewport" content="width=device-width, initial-scale=1.0">
+       <title>Paolo Cimenti's Blog — Articolo</title>
+       <link rel="preconnect" href="https://fonts.googleapis.com" />
+       <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+       <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet" />
+       <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+ integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+       <link rel="stylesheet" href="css/style.css" />
+       <link rel="shortcut icon" href="images/profile.png" type="image/x-icon"/>
+   </head>
+   <body>
+
+       <nav id="navbar-container" data-page="Articolo" data-nav="back"></nav>
+
+       <!-- Qui post.js inserirà l'articolo completo -->
+       <div id="post-container">
+           <p style="text-align: center; padding: 40px;">Caricamento articolo...</p>
+       </div>
+
+       <!-- Sezione commenti: nascosta finché il post non è caricato -->
+       <div id="comments-container" style="display: none;">
+
+           <section class="hero">
+               <div class="container">
+                   <div class="heading">
+                       <h1 class="title">Commenti</h1>
+                       <p class="date-time" id="comment-count">0 commenti</p>
+                   </div>
+                   <div class="content">
+                       <div id="comments-list"></div>
+                   </div>
+               </div>
+           </section>
+
+           <section class="hero">
+               <div class="container">
+                   <div class="heading">
+                       <h1 class="title">Lascia un commento</h1>
+                       <p class="date-time">Con un nome protetto da password, oppure da Anonimo.</p>
+                   </div>
+                   <div class="content">
+                       <form id="comment-form" novalidate>
+                           <!-- HONEYPOT: campo invisibile. I bot riempiono TUTTI i campi:
+                                se questo è compilato, sappiamo che è un bot. -->
+                           <div style="display:none;">
+                               <input type="text" id="website" name="website" tabindex="-1" autocomplete="off">
+                           </div>
+
+                           <div style="display: flex; gap: 16px; flex-wrap: wrap;">
+                               <div class="comment-field" style="flex:1; min-width:220px;">
+                                   <label for="comment-name">Nome</label>
+                                   <input type="text" id="comment-name" class="text-input contact-input"
+                                          placeholder="Il tuo nome..." maxlength="40">
+                               </div>
+                               <div class="comment-field" style="flex:1; min-width:220px;">
+                                   <label for="comment-password">Password</label>
+                                   <input type="password" id="comment-password" class="text-input contact-input"
+                                          placeholder="Minimo 4 caratteri" autocomplete="new-password">
+                               </div>
+                           </div>
+
+                           <label class="comment-checkbox">
+                               <input type="checkbox" id="anonimo-check"> Commenta come Anonimo
+                           </label>
+
+                           <div class="comment-field">
+                               <label for="comment-text">Il tuo commento</label>
+                               <textarea id="comment-text" class="text-input contact-input" rows="4"
+                                         maxlength="2000" placeholder="Scrivi qui..."></textarea>
+                           </div>
+
+                           <button type="submit" id="comment-submit" class="btn navbutton sendbutton" style="width:100%;">
+                               <i class="fas fa-comment-dots"></i> Invia commento
+                           </button>
+                       </form>
+                       <!-- Qui finiscono i messaggi di esito (successo / errori) -->
+                       <div id="comment-feedback" style="margin-top: 10px;"></div>
+                   </div>
+               </div>
+           </section>
+       </div>
+
+       <div class="page-wrapper"></div>
+       <div id="footer-condiviso"></div>
+
+       <!-- Supabase + script della pagina + componenti condivisi -->
+       <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+       <script src="js/post.js"></script>
+       <script src="js/main.js"></script>
+   </body>
+   </html>

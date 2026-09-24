@@ -8,6 +8,7 @@ const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 let allProjects = [];
 let activeFilters = new Set(); // empty = "all"
+let conteggiCommenti = {};     // { id_progetto: numero di commenti }
 
 // ---- Tab switching (multi-select) ----
 function setupTabs() {
@@ -72,6 +73,8 @@ async function loadProjects() {
     }
 
     allProjects = data || [];
+    // I conteggi devono essere pronti prima del primo disegno (come in blog.js)
+    await caricaConteggiCommenti();
 
     if (allProjects.length === 0) {
         if (container) container.innerHTML = `
@@ -88,6 +91,21 @@ async function loadProjects() {
     }
 
     renderProjects();
+}
+
+// ---- Conteggio commenti per progetto (link "Commenti (N)") ----
+async function caricaConteggiCommenti() {
+    const { data, error } = await db
+        .from('comments')
+        .select('post_id');   // basta solo l'id: il conteggio lo facciamo qui
+    if (error) {
+        console.error("Errore nel conteggio commenti:", error);
+        return;
+    }
+    conteggiCommenti = {};
+    data.forEach(c => {
+        conteggiCommenti[c.post_id] = (conteggiCommenti[c.post_id] || 0) + 1;
+    });
 }
 
 // ---- Render filtered projects ----
@@ -123,6 +141,8 @@ function renderProjects() {
         const subs = Array.isArray(project.sottocategoria)
             ? project.sottocategoria
             : (project.sottocategoria ? [project.sottocategoria] : []);
+        // Badge in ordine alfabetico
+        subs.sort((a, b) => a.localeCompare(b, 'it'));
 
         // Un badge per ogni sottocategoria
         const badges = subs.map(sub => {
@@ -154,7 +174,7 @@ function renderProjects() {
                 <div class="container">
                     ${badges}
                     <div class="heading">
-                        <h1 class="title">${project.titolo}</h1>
+                        <h1 class="title"><a class="post-title-link" href="post.html?id=${project.id}">${project.titolo}</a></h1>
                         <p class="date-time">${dataOra}</p>
                     </div>
                     <div class="content">
@@ -163,11 +183,20 @@ function renderProjects() {
                         </div>
                         ${tagImmagine}
                     </div>
+
+                    <div class="comments-link-wrap">
+                        <a class="post-comments-link" href="post.html?id=${project.id}">
+                            <i class="fas fa-comment-dots"></i> Commenti (${conteggiCommenti[project.id] || 0})
+                        </a>
+                    </div>
                 </div>
             </section>`;
 
         container.innerHTML += postHTML;
     });
+
+    // I link del contenuto si aprono in una nuova scheda
+    rendiLinkEsterni(container);
 }
 
 // ---- Init ----

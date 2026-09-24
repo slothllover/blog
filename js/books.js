@@ -1,20 +1,61 @@
-// 1. Configurazione e Connessione a Supabase
+// ============================================================
+// books.js — Carica, filtra e mostra le recensioni dei libri
+// ============================================================
+
 const SUPABASE_URL = "https://rylrgyqvabgtvcjwidqg.supabase.co";
-const SUPABASE_KEY = "sb_publishable_ltI-p9eQ9K9zfUDwRnwAlg_aThQgZvP"; 
+const SUPABASE_KEY = "sb_publishable_ltI-p9eQ9K9zfUDwRnwAlg_aThQgZvP";
 const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// 2. Funzione principale per recuperare e mostrare i libri
+let allBooks = [];
+let activeFilters = new Set(); // empty = "all"
+
+// ---- Tab per categoria (stesso pattern di blog.js/projects.js) ----
+function setupBooksTabs() {
+    const tabsContainer = document.querySelector('.books-tabs');
+    if (!tabsContainer) return;
+
+    tabsContainer.addEventListener('click', (e) => {
+        const tab = e.target.closest('.tab');
+        if (!tab) return;
+
+        const filter = tab.dataset.filter;
+
+        if (filter === 'all') {
+            activeFilters.clear();
+        } else {
+            if (activeFilters.has(filter)) {
+                activeFilters.delete(filter);
+            } else {
+                activeFilters.add(filter);
+            }
+        }
+
+        updateBooksTabUI();
+        renderBooks();
+    });
+}
+
+function updateBooksTabUI() {
+    document.querySelectorAll('.books-tabs .tab').forEach(tab => {
+        const f = tab.dataset.filter;
+        if (f === 'all') {
+            tab.classList.toggle('active', activeFilters.size === 0);
+        } else {
+            tab.classList.toggle('active', activeFilters.has(f));
+        }
+    });
+}
+
+// ---- Caricamento da Supabase ----
 async function caricaLibri() {
     const container = document.getElementById('books-container');
 
-    // Chiediamo a Supabase solo i post con categoria 'books', ordinati dal più recente
     const { data: posts, error } = await db
         .from('posts')
         .select('*')
         .eq('categoria', 'books') // <--- FILTRO FONDAMENTALE!
         .order('created_at', { ascending: false });
 
-    // Gestione errori
     if (error) {
         console.error("Errore nel recupero dei libri:", error);
         if (container) {
@@ -29,8 +70,9 @@ async function caricaLibri() {
         return;
     }
 
-    // Se non ci sono ancora libri recensiti
-    if (posts.length === 0) {
+    allBooks = posts || [];
+
+    if (allBooks.length === 0) {
         if (container) {
             container.innerHTML = `
                 <section class="bookreview">
@@ -43,23 +85,57 @@ async function caricaLibri() {
         return;
     }
 
-    // Svuotiamo il contenitore dal messaggio di caricamento
+    renderBooks();
+}
+
+// ---- Render (filtrato, badge in ordine alfabetico) ----
+function renderBooks() {
+    const container = document.getElementById('books-container');
+    if (!container) return;
+
+    const filtered = activeFilters.size === 0
+        ? allBooks
+        : allBooks.filter(p => {
+            const subs = Array.isArray(p.sottocategoria)
+                ? p.sottocategoria
+                : (p.sottocategoria ? [p.sottocategoria] : []);
+            return subs.some(s => activeFilters.has(s));
+        });
+
+    if (filtered.length === 0) {
+        if (container) {
+            container.innerHTML = `
+                <section class="bookreview">
+                    <div class="container">
+                        <p style="text-align: center; color: #666;">Nessuna recensione con le categorie selezionate.</p>
+                    </div>
+                </section>
+            `;
+        }
+        return;
+    }
+
     if (container) container.innerHTML = "";
 
-    // 3. Cicliamo i post dei libri ricevuti e generiamo l'HTML con lo stile "bookreview"
-    posts.forEach(post => {
+    filtered.forEach(post => {
+        // Sottocategorie normalizzate, copia + ordinamento alfabetico
+        const subs = (Array.isArray(post.sottocategoria)
+            ? post.sottocategoria
+            : (post.sottocategoria ? [post.sottocategoria] : [])).slice();
+        subs.sort((a, b) => a.localeCompare(b, 'it'));
+
+        const badges = subs.map(sub =>
+            `<span class="project-badge ${sub.toLowerCase()}">${sub}</span>`).join('');
+
         let tagImmagine = "";
-        
         if (post.immagine && post.immagine.trim() !== "") {
             let urlImmagine = post.immagine;
-            // Applichiamo l'ottimizzazione automatica di Cloudinary se l'immagine arriva da lì
             if (urlImmagine.includes("cloudinary.com")) {
                 urlImmagine = urlImmagine.replace("/upload/", "/upload/f_auto,q_auto/");
             }
             tagImmagine = `<img src="${urlImmagine}" alt="Copertina Libro">`;
         }
 
-        // Formattazione data e ora
         const dataFormattata = new Date(post.created_at).toLocaleDateString('en-US', {
             day: 'numeric',
             month: 'long',
@@ -71,15 +147,15 @@ async function caricaLibri() {
             minute: '2-digit'
         });
 
-        // Generiamo la struttura usando la tua classe CSS "bookreview" specifica per questa pagina
         const postHTML = `
             <section class="bookreview">
                 <div class="container">
+                    ${badges}
                     <div class="heading">
                         <h1 class="title">${post.titolo}</h1>
                         <p class="date-time">${dataFormattata} - ${oraFormattata}</p>
                     </div>
-                    
+
                     <div class="content">
                         ${tagImmagine}
                         <div>
@@ -90,12 +166,15 @@ async function caricaLibri() {
             </section>
         `;
 
-        // Iniettiamo la recensione nella pagina dei libri
         if (container) {
             container.innerHTML += postHTML;
         }
     });
+
+    // I link del contenuto si aprono in una nuova scheda
+    rendiLinkEsterni(container);
 }
 
-// 4. Avviamo la funzione automaticamente
+// ---- Avvio ----
+setupBooksTabs();
 caricaLibri();

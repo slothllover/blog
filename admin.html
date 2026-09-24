@@ -44,6 +44,9 @@
                 <button class="admin-tab" data-tab="manage-posts">
                     <i class="fas fa-list"></i> I Miei Post
                 </button>
+                <button class="admin-tab" data-tab="manage-comments">
+                       <i class="fas fa-comments"></i> Commenti
+                   </button>
                 <button class="admin-tab admin-tab-logout" id="logout-btn">
                     <i class="fas fa-sign-out-alt"></i> Esci
                 </button>
@@ -113,6 +116,7 @@
                         <button type="button" onclick="formato('bold')"><b>B</b></button>
                         <button type="button" onclick="formato('italic')"><i>I</i></button>
                         <button type="button" onclick="formato('underline')" style="text-decoration:underline">U</button>
+                        <button type="button" onclick="inserisciLink()" title="Inserisci link"><i class="fas fa-link"></i></button>
                         <div class="sep"></div>
                         <button type="button" onclick="inserisci('À')">À</button>
                         <button type="button" onclick="inserisci('È')">È</button>
@@ -121,14 +125,7 @@
                         <button type="button" onclick="inserisci('Ò')">Ò</button>
                         <button type="button" onclick="inserisci('Ù')">Ù</button>
                         <div class="sep"></div>
-                        <button type="button" onclick="inserisci('ä')">ä</button>
-                        <button type="button" onclick="inserisci('ö')">ö</button>
-                        <button type="button" onclick="inserisci('ü')">ü</button>
-                        <button type="button" onclick="inserisci('Ä')">Ä</button>
-                        <button type="button" onclick="inserisci('Ö')">Ö</button>
-                        <button type="button" onclick="inserisci('Ü')">Ü</button>
-                        <button type="button" onclick="inserisci('ß')">ß</button>
-                        <div class="sep"></div>
+
                         <button type="button" onclick="inserisci('«')">«</button>
                         <button type="button" onclick="inserisci('»')">»</button>
                         <button type="button" onclick="inserisci('…')">…</button>
@@ -162,8 +159,33 @@
                         <i class="fas fa-sync-alt"></i> Aggiorna
                     </button>
                 </div>
+                <div class="admin-filter-tabs">
+                    <button class="tab active" data-admin-filter="all">Tutti</button>
+                    <button class="tab" data-admin-filter="blog">Blog</button>
+                    <button class="tab" data-admin-filter="books">Libri</button>
+                    <button class="tab" data-admin-filter="projects">Progetti</button>
+                </div>
                 <div id="post-list" style="overflow-x: auto;">
                     <p style="text-align: center; color: #999; padding: 30px;">Caricamento…</p>
+                </div>
+            </div>
+            <!-- TAB: Gestione Commenti -->
+               <div id="tab-manage-comments" class="admin-tab-content">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                    <h2 style="margin:0; color:#313131;">Commenti</h2>
+                    <button id="refresh-comments-btn" class="admin-btn admin-btn-small" style="background:#eee; color:#555;">
+                        <i class="fas fa-sync-alt"></i> Aggiorna
+                    </button>
+                </div>
+
+                <h3 style="margin:0 0 6px; color:#313131;">Nomi registrati</h3>
+                <div id="commentator-list" style="overflow-x:auto;">
+                    <p style="text-align:center; color:#999; padding:20px;">Caricamento…</p>
+                </div>
+
+                <h3 style="margin:24px 0 6px; color:#313131;">Commenti</h3>
+                <div id="admin-comments-list" style="overflow-x:auto;">
+                    <p style="text-align:center; color:#999; padding:20px;">Caricamento…</p>
                 </div>
             </div>
 
@@ -177,6 +199,45 @@
         const editor = document.getElementById('content');
         function formato(cmd) { document.execCommand(cmd, false, null); editor.focus(); }
         function inserisci(ch) { editor.focus(); document.execCommand('insertText', false, ch); }
+        // Piccola protezione per testo e URL dentro l'HTML che costruiamo
+        function escHtml(s) {
+            return String(s)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        function inserisciLink() {
+            let url = prompt("Inserisci l'URL del link (es. https://...):");
+            if (url === null || url.trim() === '') return;   // ha premuto Annulla
+            url = url.trim();
+            // Se manca lo schema (http/https), lo aggiungiamo noi:
+            // altrimenti il browser lo tratterebbe come link RELATIVO
+            if (!/^[a-z]+:\/\//i.test(url)) {
+                url = "https://" + url;
+            }
+
+            // 1) La scritta del link = testo selezionato (se c'è) oppure testo a scelta
+            let testo = (window.getSelection ? window.getSelection().toString() : '').trim();
+            if (testo === '') {
+                testo = prompt("Con quale scritta vuoi mostrare il link?");
+                if (testo === null || testo.trim() === '') return;
+                testo = testo.trim();
+            }
+
+            editor.focus();
+
+            // 2) Inserisce UN SOLO blocco <a> al punto del cursore:
+            //    sostituisce la selezione se c'era, altrimenti appare dove sta il cursore.
+            //    (createLink con cursore vuoto non fa nulla nei browser: da qui il fix)
+            //    target="_blank" = si apre in una nuova scheda; rel="noopener" = sicurezza
+            document.execCommand('insertHTML', false,
+                `<a href="${escHtml(url)}" target="_blank" rel="noopener">${escHtml(testo)}</a>`);
+
+            editor.focus();
+        }
     </script>
 
     <script src="js/admin.js"></script>

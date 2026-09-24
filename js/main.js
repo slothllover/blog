@@ -9,6 +9,29 @@
 function generaNavbar(pageTitle) {
     const nav = document.getElementById('navbar-container');
     if (!nav) return;
+       if (nav.dataset.nav === 'back') {
+           nav.innerHTML = `
+           <div class="navbar">
+               <div class="container">
+                   <div class="navbar-left">
+                       <div class="logo">
+                           <a href="index.html">
+                               <img src="images/profile.png" alt="logo">
+                           </a>
+                       </div>
+                       <div>
+                           <a href="index.html" class="page-name">${pageTitle} <span>-</span> Paolo Cimenti's Blog</a>
+                       </div>
+                   </div>
+                   <div class="navbar-right">
+                       <button class="back-btn" onclick="tornaIndietro()" aria-label="Torna indietro">
+                           <i class="fas fa-arrow-left"></i> Indietro
+                       </button>
+                   </div>
+               </div>
+           </div>`;
+           return;   // qui la funzione si ferma: niente menu
+       }
 
     const titolo = pageTitle || '';
 
@@ -111,3 +134,28 @@ document.addEventListener('DOMContentLoaded', () => {
     if (nav) generaNavbar(nav.dataset.page || '');
     generaFooter();
 });
+
+// ---- Link nel contenuto dei post: apertura in nuova scheda ----
+// Ogni pagina che inietta contenuto dei post lo chiama sul proprio contenitore.
+// Lo scopo a[href] esclude i link di navigazione (titolo e "Commenti"),
+// che stanno FUORI da .content e devono restare nella stessa scheda.
+function rendiLinkEsterni(root) {
+    if (!root) return;
+    root.querySelectorAll('.content a[href]').forEach(a => {
+        a.target = '_blank';
+        a.rel = 'noopener';
+    });
+}
+
+// ---- Tasto "Indietro" della navbar semplice ----
+function tornaIndietro() {
+    // window.history è la cronologia del browser:
+    // back() fa esattamente ciò che fa il tasto ← del browser
+    if (window.history.length > 1) {
+        window.history.back();
+    } else {
+        // Se non c'è una pagina precedente (es. sei arrivato qui
+        // da un link diretto, tipo Google), ripiega sulla home
+        window.location.href = 'index.html';
+    }
+}

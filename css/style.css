@@ -801,6 +801,7 @@ todo.html
    ============================================================ */
 
 .projects-page,
+.books-page,
 .blog-page {
     margin: 20px auto;
     max-width: 1200px;
@@ -808,26 +809,30 @@ todo.html
 }
 
 .projects-page .container,
-.blog-page .container {
+.blog-page .container,
+.books-page .container {
     padding: 20px;
     width: 100%;
 }
 
 .projects-header,
-.blog-header {
+.blog-header,
+.books-header {
     text-align: center;
     padding-bottom: 10px;
 }
 
 .projects-header h1,
-.blog-header h1 {
+.blog-header h1,
+.books-header h1 {
     font-size: 2rem;
     color: #313131;
     margin-bottom: 4px;
 }
 
 .projects-header p,
-.blog-header p {
+.blog-header p,
+.books-header p {
     color: #666;
     font-size: 0.95rem;
 }
@@ -835,7 +840,9 @@ todo.html
 /* Filter tabs (projects + blog) */
 
 .projects-tabs,
-.blog-tabs {
+.blog-tabs,
+.books-tabs,
+.admin-filter-tabs {
     display: flex;
     gap: 8px;
     justify-content: center;
@@ -846,7 +853,9 @@ todo.html
 }
 
 .projects-tabs .tab,
-.blog-tabs .tab {
+.blog-tabs .tab,
+.books-tabs .tab,
+.admin-filter-tabs .tab {
     padding: 8px 18px;
     border: 2px solid #ccc;
     border-radius: 20px;
@@ -860,13 +869,17 @@ todo.html
 }
 
 .projects-tabs .tab:hover,
-.blog-tabs .tab:hover {
+.blog-tabs .tab:hover,
+.books-tabs .tab:hover,
+.admin-filter-tabs .tab:hover {
     border-color: #1e3a1e;
     color: #1e3a1e;
 }
 
 .projects-tabs .tab.active,
-.blog-tabs .tab.active {
+.blog-tabs .tab.active,
+.books-tabs .tab.active,
+.admin-filter-tabs .tab.active {
     background: #1e3a1e;
     color: white;
     border-color: #1e3a1e;
@@ -874,7 +887,8 @@ todo.html
 
 /* X indicator on active subcategory tabs (not Tutti) */
 .projects-tabs .tab.active[data-filter]:not([data-filter="all"])::after,
-.blog-tabs .tab.active[data-filter]:not([data-filter="all"])::after {
+.blog-tabs .tab.active[data-filter]:not([data-filter="all"])::after,
+.books-tabs .tab.active[data-filter]:not([data-filter="all"])::after {
     content: " ×";
     font-size: 11px;
     opacity: 0.7;
@@ -893,29 +907,28 @@ todo.html
     margin-bottom: 8px;
 }
 
-.project-badge.elettronica {
-    background: #fff0cc;
-    color: #9a6e00;
-}
-
-.project-badge.informatica {
-    background: #cce5ff;
-    color: #004e9a;
-}
-
-.project-badge.ai {
-    background: #e8ccff;
-    color: #5c009a;
-}
+.project-badge.elettronica { background: #f5dcc3; color: #8a4b12; }   /* rame */
+.project-badge.informatica { background: #d3f0f4; color: #0f7d94; }   /* ciano */
+.project-badge.ai          { background: #424242; color: #ffffff; }   /* grafite scuro */
 
 /* Blog category badges */
-.project-badge.sport     { background: #ffe0cc; color: #9a4d00; }
-.project-badge.viaggi    { background: #cce5ff; color: #004e9a; }
-.project-badge.everyday  { background: #e8f5e9; color: #2e7d32; }
-.project-badge.tech      { background: #e3f2fd; color: #1565c0; }
-.project-badge.musica    { background: #fce4ec; color: #c62828; }
-.project-badge.eventi    { background: #f3e5f5; color: #7b1fa2; }
-.project-badge.scuola    { background: #fff9c4; color: #827717; }
+.project-badge.sport     { background: #ffe0cc; color: #9a4d00; }   /* arancio */
+.project-badge.viaggi    { background: #cce5ff; color: #004e9a; }   /* azzurro cielo */
+.project-badge.everyday  { background: #dcf2c9; color: #3d7a1e; }   /* verde lime */
+.project-badge.tech      { background: #e3e8ff; color: #283593; }   /* indaco */
+.project-badge.musica    { background: #fce4ec; color: #c62828; }   /* rosa */
+.project-badge.eventi    { background: #f3e5f5; color: #7b1fa2; }   /* malva */
+.project-badge.scuola    { background: #fff9c4; color: #827717; }   /* giallo */
+.project-badge.storia    { background: #f0e6d8; color: #6d4c41; }   /* marrone */
+
+/* Libri */
+.project-badge.classici    { background: #fff3e0; color: #8d6e63; } /* crema */
+.project-badge.fantascienza { background: #e7d9f8; color: #6a2c91; } /* viola notturno */
+.project-badge.filosofia   { background: #e0e8f5; color: #35507a; } /* blu acciaio */
+.project-badge.non-fiction { background: #eceff1; color: #546e7a; } /* ardesia */
+.project-badge.politica     { background: #e9edc8; color: #5f6f1f; } /* verde oliva */
+.project-badge.romanzi     { background: #ffdce5; color: #ad1457; } /* lampone */
+.project-badge.scienza     { background: #c9efe8; color: #0f7a67; } /* verde acqua */
 
 /* ============================================================
    Admin Panel
@@ -1504,4 +1517,139 @@ todo.html
         max-width: 95vw;
         max-height: 75vh;
     }
+}
+
+   /* ============================================================
+      Commenti (post.html)
+      ============================================================ */
+
+   .comment {
+       background: #fdfaf3;
+       border-left: 4px solid #2d5a27;
+       padding: 12px 16px;
+       border-radius: 8px;
+       margin-bottom: 14px;
+   }
+
+   .comment-header {
+       display: flex;
+       justify-content: space-between;
+       gap: 12px;
+       flex-wrap: wrap;
+   }
+
+   .comment-header strong {
+       color: #1e3a1e;
+   }
+
+   .comment-header time {
+       color: #888;
+       font-size: .85rem;
+   }
+
+   .comment-text {
+       margin-top: 6px;
+       color: #444;
+       line-height: 1.5;
+       /* Rispetta i "a capo" scritti dall'utente, senza interpretare HTML */
+       white-space: pre-line;
+   }
+
+   .comment-field label {
+       display: block;
+       font-weight: 600;
+       margin-bottom: 6px;
+       color: #1e3a1e;
+   }
+
+   /* bella scoperta: white-space: pre-line gestisce i \n nel testo
+      senza che dobbiamo trasformarli in <br> — e quindi senza mai
+      interpretare l'input come HTML (un rischio in meno) */
+
+   .comment-checkbox {
+       display: inline-flex;
+       align-items: center;
+       gap: 8px;
+       margin: 10px 0;
+       cursor: pointer;
+       font-weight: 600;
+       color: #1e3a1e;
+   }
+
+   textarea.text-input {
+       resize: vertical;
+   }
+   /* ============================================================
+      Link al post singolo (fase 3)
+      ============================================================ */
+
+   .post-title-link {
+       color: #1e3a1e;                 /* verde scuro: visibile sul bianco dell'hero */
+       text-decoration: none;
+   }
+
+   .post-title-link:hover {
+       text-decoration: underline;
+   }
+
+   .post-comments-link {
+       display: inline-block;
+       margin-top: 14px;
+       padding: 6px 14px;
+       background: #e8f2e2;
+       color: #2d5a27;
+       border-radius: 20px;
+       font-weight: 600;
+       font-size: .9rem;
+       transition: background .2s;
+   }
+
+   .post-comments-link:hover {
+       background: #2d5a27;
+       color: #fff;
+   }
+   .comments-link-wrap {
+       text-align: left;
+       margin-top: 6px;
+   }
+   /* ============================================================
+      Navbar semplice (post.html): tasto Indietro
+      ============================================================ */
+
+   .back-btn {
+       background: #2d5a27;
+       color: var(--light-color);
+       font-weight: 600;
+       padding: 13px 20px;
+       border: none;
+       border-radius: 10px;
+       cursor: pointer;
+       font-family: "Poppins", sans-serif;
+       font-size: 16px;
+       transition: 0.3s;
+       display: inline-flex;
+       align-items: center;
+       gap: 8px;
+       white-space: nowrap;
+   }
+
+   .back-btn:hover {
+       background: #234a1f;
+   }
+
+/* ============================================================
+   Link nel contenuto dei post
+   ============================================================ */
+
+/* Il colore globale dei link (verde chiarissimo) è pensato per la navbar
+   scura: sul bianco delle card sarebbe illeggibile. Lo sostituiamo qui. */
+.hero .container .content a,
+.bookreview .container .content a {
+    color: #1a5276;
+    text-decoration: underline;
+}
+
+.hero .container .content a:hover,
+.bookreview .container .content a:hover {
+    color: #14394f;
 }

@@ -22,9 +22,9 @@ const LAYOUTS = {
 
 // Categorie disponibili per ogni tipo di post
 const CATEGORY_SUBCATEGORIES = {
-    blog: ['Sport', 'Viaggi', 'Everyday', 'Tech', 'Musica', 'Eventi', 'Scuola'],
-    projects: ['Elettronica', 'Informatica', 'AI'],
-    books: []
+    blog: ['Eventi', 'Everyday', 'Musica', 'Scuola', 'Sport', 'Tech', 'Viaggi'],
+    projects: ['AI', 'Elettronica', 'Informatica'],
+    books: ['Classici', 'Fantascienza', 'Filosofia', 'Non-fiction', 'Politica', 'Romanzi', 'Scienza', 'Storia']
 };
 
 // Colori badge per ogni sottocategoria (usati anche nella home)
@@ -32,15 +32,24 @@ const SUBCATEGORY_COLORS = {
     // Blog
     'Sport':       { bg: '#ffe0cc', color: '#9a4d00' },
     'Viaggi':      { bg: '#cce5ff', color: '#004e9a' },
-    'Everyday':    { bg: '#e8f5e9', color: '#2e7d32' },
-    'Tech':        { bg: '#e3f2fd', color: '#1565c0' },
+    'Everyday':    { bg: '#dcf2c9', color: '#3d7a1e' },
+    'Tech':        { bg: '#e3e8ff', color: '#283593' },
     'Musica':      { bg: '#fce4ec', color: '#c62828' },
     'Eventi':      { bg: '#f3e5f5', color: '#7b1fa2' },
     'Scuola':      { bg: '#fff9c4', color: '#827717' },
     // Projects
-    'Elettronica': { bg: '#fff0cc', color: '#9a6e00' },
-    'Informatica': { bg: '#cce5ff', color: '#004e9a' },
-    'AI':          { bg: '#e8ccff', color: '#5c009a' }
+    'Elettronica': { bg: '#f5dcc3', color: '#8a4b12' },
+    'Informatica': { bg: '#d3f0f4', color: '#0f7d94' },
+    'AI':          { bg: '#424242', color: '#ffffff' },
+    // Libri
+    'Classici':    { bg: '#fff3e0', color: '#8d6e63' },
+    'Fantascienza': { bg: '#e7d9f8', color: '#6a2c91' },
+    'Filosofia':   { bg: '#e0e8f5', color: '#35507a' },
+    'Non-fiction': { bg: '#eceff1', color: '#546e7a' },
+    'Politica':    { bg: '#e9edc8', color: '#5f6f1f' },
+    'Romanzi':     { bg: '#ffdce5', color: '#ad1457' },
+    'Scienza':     { bg: '#c9efe8', color: '#0f7a67' },
+    'Storia':      { bg: '#f0e6d8', color: '#6d4c41' }
 };
 
 function getSubcategories() {
@@ -118,6 +127,7 @@ document.querySelectorAll('.admin-tab[data-tab]').forEach(tab => {
         document.querySelectorAll('.admin-tab-content').forEach(tc => tc.classList.remove('active'));
         document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
         if (tab.dataset.tab === 'manage-posts') loadPostList();
+        if (tab.dataset.tab === 'manage-comments') loadCommentiAdmin();
     });
 });
 
@@ -128,7 +138,7 @@ document.querySelectorAll('.admin-tab[data-tab]').forEach(tab => {
 const categorySelect = document.getElementById('category');
 const subcategoryGroup = document.getElementById('subcategory-group');
 
-categorySelect.addEventListener('change', () => {
+function aggiornaSubcategorie() {
     const cat = categorySelect.value;
     const subsExist = (CATEGORY_SUBCATEGORIES[cat] || []).length > 0;
     if (subsExist) {
@@ -137,7 +147,12 @@ categorySelect.addEventListener('change', () => {
     } else {
         subcategoryGroup.style.display = 'none';
     }
-});
+}
+
+categorySelect.addEventListener('change', aggiornaSubcategorie);
+// Inizializzazione: senza questa riga, la destinazione di default "Home Page (Blog)"
+// parte senza sottocategorie finché non cambi destinazione (bug che hai trovato tu).
+aggiornaSubcategorie();
 
 // ============================================================
 // 4. IMAGE SLOTS
@@ -249,7 +264,9 @@ submitBtn.addEventListener('click', async () => {
     };
     if (immagineFinale) record.immagine = immagineFinale;
     if (galleriaFinale) record.galleria = galleriaFinale;
-    if (categoryInput === 'projects' || categoryInput === 'blog') record.sottocategoria = subcategoriesArray;
+    if (CATEGORY_SUBCATEGORIES[categoryInput]?.length) {
+        record.sottocategoria = subcategoriesArray;
+    }
 
     let error;
     if (editId) {
@@ -296,8 +313,25 @@ function clearForm() {
 document.getElementById('clear-form-btn').addEventListener('click', clearForm);
 
 // ============================================================
-// 8. LOAD POST LIST
+// 8. LOAD POST LIST (con filtro per categoria)
 // ============================================================
+
+let adminFilter = 'all'; // 'all' | 'blog' | 'books' | 'projects'
+
+function setupAdminPostFilters() {
+    const tabsContainer = document.querySelector('.admin-filter-tabs');
+    if (!tabsContainer) return;
+
+    tabsContainer.addEventListener('click', (e) => {
+        const tab = e.target.closest('.tab');
+        if (!tab) return;
+        adminFilter = tab.dataset.adminFilter || 'all';
+        document.querySelectorAll('.admin-filter-tabs .tab').forEach(t => {
+            t.classList.toggle('active', t === tab);
+        });
+        loadPostList();
+    });
+}
 
 async function loadPostList() {
     const container = document.getElementById('post-list');
@@ -312,12 +346,22 @@ async function loadPostList() {
         return;
     }
 
+    // Filtro per categoria attiva (tab Tutti / Blog / Libri / Progetti)
+    let posts = data;
+    if (adminFilter !== 'all') {
+        posts = data.filter(p => (p.categoria || 'blog') === adminFilter);
+    }
+    if (posts.length === 0) {
+        container.innerHTML = `<p style="text-align:center; color:#666; padding:30px;">Nessun post in questa categoria.</p>`;
+        return;
+    }
+
     const catLabels = { blog: 'Blog', books: 'Libri', projects: 'Progetti' };
 
     let html = `<table class="admin-post-list">
         <thead><tr><th>Titolo</th><th>Categoria</th><th>Data</th><th style="width:120px;">Azioni</th></tr></thead><tbody>`;
 
-    data.forEach(post => {
+    posts.forEach(post => {
         const cat = post.categoria || 'blog';
         const subs = Array.isArray(post.sottocategoria) ? post.sottocategoria : (post.sottocategoria ? [post.sottocategoria] : []);
         const date = new Date(post.created_at).toLocaleDateString('it-IT', { day: '2-digit', month: 'short', year: 'numeric' });
@@ -346,6 +390,7 @@ async function loadPostList() {
 }
 
 document.getElementById('refresh-posts-btn').addEventListener('click', loadPostList);
+setupAdminPostFilters();
 
 // ============================================================
 // 9. EDIT POST
@@ -365,7 +410,7 @@ async function editPost(id) {
     document.getElementById('content').innerHTML = data.contenuto || '';
     document.getElementById('category').value = data.categoria || 'blog';
 
-    if (data.categoria === 'projects' || data.categoria === 'blog') {
+    if ((CATEGORY_SUBCATEGORIES[data.categoria] || []).length > 0) {
         renderSubcategoryCheckboxes(data.categoria);
         subcategoryGroup.style.display = 'block';
         setSubcategories(data.sottocategoria);
@@ -404,3 +449,158 @@ async function deletePost(id) {
     const logged = await checkSession();
     if (logged) loadPostList();
 })();
+
+   // ============================================================
+   // 11. TAB COMMENTI — elenco, azioni, nomi registrati
+   // ============================================================
+
+   // Escaping: i commenti sono scritti da utenti, niente innerHTML "nudo"
+   function escHtml(s) {
+       return String(s ?? '')
+           .replace(/&/g, '&amp;')
+           .replace(/</g, '&lt;')
+           .replace(/>/g, '&gt;')
+           .replace(/"/g, '&quot;')
+           .replace(/'/g, '&#39;');
+   }
+
+   async function loadCommentiAdmin() {
+       const nContainer = document.getElementById('commentator-list');
+       const cContainer = document.getElementById('admin-comments-list');
+       if (!nContainer || !cContainer) return;
+
+       // ---- 1) NOMI REGISTRATI ----
+       nContainer.innerHTML = '<p style="text-align:center; color:#999; padding:20px;">Caricamento…</p>';
+       const { data: nomi, error: errNomi } = await db
+           .from('commentators')
+           .select('*')
+           .order('created_at', { ascending: false });
+
+       if (errNomi) {
+           nContainer.innerHTML = `<p style="color:red;">Errore: ${escHtml(errNomi.message)}</p>`;
+       } else if (!nomi || nomi.length === 0) {
+           nContainer.innerHTML = '<p style="text-align:center; color:#666;">Nessun nome registrato.</p>';
+       } else {
+           let html = `<table class="admin-post-list">
+               <thead><tr><th>Nome</th><th>Registrato il</th><th style="width:330px;">Azioni</th></tr></thead><tbody>`;
+
+           nomi.forEach(n => {
+               const dataReg = new Date(n.created_at).toLocaleDateString('it-IT',
+                   { day: '2-digit', month: 'short', year: 'numeric' });
+               // Il nome dentro onclick va "fuggito" per il JavaScript:
+               // un apostrofo lo romperebbe. escHtml NON va usato qui dentro
+               // (l'HTML decodifica le entità due volte: prima il browser, poi JS)
+               const nomeJs = n.name.replace(/'/g, "\\'");
+
+               html += `<tr>
+                   <td>${escHtml(n.name)}</td>
+                   <td>${dataReg}</td>
+                   <td>
+                       <button class="admin-btn admin-btn-small admin-btn-primary" onclick="resetNome('${nomeJs}')" title="Cambia password">
+                           <i class="fas fa-key"></i> Reset pw
+                       </button>
+                       <button class="admin-btn admin-btn-small" style="background:#eee; color:#333;" onclick="eliminaNome('${nomeJs}', 'anonimizza')" title="Commenti → Anonimo, poi cancella
+ il nome">
+                           <i class="fas fa-user-slash"></i> Anonimizza
+                       </button>
+                       <button class="admin-btn admin-btn-small admin-btn-danger" onclick="eliminaNome('${nomeJs}', 'cancella')" title="Cancella nome e TUTTI i suoi commenti">
+                           <i class="fas fa-trash"></i> Cancella tutto
+                       </button>
+                   </td>
+               </tr>`;
+           });
+
+           html += '</tbody></table>';
+           nContainer.innerHTML = html;
+       }
+
+       // ---- 2) COMMENTI ----
+       cContainer.innerHTML = '<p style="text-align:center; color:#999; padding:20px;">Caricamento…</p>';
+
+       // Mappa "id post → titolo": pattern utillissimo per unire dati con una sola query
+       const { data: posts } = await db.from('posts').select('id, titolo');
+       const mappaPost = {};
+       (posts || []).forEach(p => { mappaPost[p.id] = p.titolo || '(senza titolo)'; });
+
+       const { data: commenti, error: errCommenti } = await db
+           .from('comments')
+           .select('*')
+           .order('created_at', { ascending: false });   // più recenti in alto
+
+       if (errCommenti) {
+           cContainer.innerHTML = `<p style="color:red;">Errore: ${escHtml(errCommenti.message)}</p>`;
+           return;
+       }
+       if (!commenti || commenti.length === 0) {
+           cContainer.innerHTML = '<p style="text-align:center; color:#666;">Nessun commento presente.</p>';
+           return;
+       }
+
+       let html = `<table class="admin-post-list">
+           <thead><tr><th>Post</th><th>Autore</th><th>Data</th><th>Commento</th><th style="width:110px;">Azioni</th></tr></thead><tbody>`;
+
+       commenti.forEach(c => {
+           const dataC = new Date(c.created_at).toLocaleString('it-IT',
+               { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+           const breve = c.comment_text.length > 160
+               ? c.comment_text.slice(0, 160) + '…'
+               : c.comment_text;
+
+           html += `<tr>
+               <td>${escHtml(mappaPost[c.post_id] || '(post cancellato)')}</td>
+               <td><strong>${escHtml(c.author_name)}</strong></td>
+               <td>${dataC}</td>
+               <td>${escHtml(breve)}</td>
+               <td>
+                   <button class="admin-btn admin-btn-small admin-btn-danger" onclick="eliminaCommento(${c.id})" title="Elimina commento">
+                       <i class="fas fa-trash"></i>
+                   </button>
+               </td>
+           </tr>`;
+       });
+
+       html += '</tbody></table>';
+       cContainer.innerHTML = html;
+   }
+
+   document.getElementById('refresh-comments-btn').addEventListener('click', loadCommentiAdmin);
+
+   // ---- Azioni ----
+   async function eliminaCommento(id) {
+       if (!confirm("Eliminare definitivamente questo commento?")) return;
+       const { error } = await db.from('comments').delete().eq('id', id);
+       if (error) {
+           alert("Errore: " + error.message);
+       } else {
+           alert("Commento eliminato.");
+           loadCommentiAdmin();
+       }
+   }
+
+   async function eliminaNome(nome, modalita) {
+       const msg = modalita === 'cancella'
+           ? `Cancellare il nome "${nome}" e TUTTI i suoi commenti?`
+           : `Anonimizzare i commenti di "${nome}" e poi cancellare il nome?`;
+       if (!confirm(msg)) return;
+
+       // le due funzioni RPC del database: qui si vede tutto il lavoro di fase 1
+       const { data, error } = await db.rpc('delete_commentator', {
+           p_name: nome,
+           p_mode: modalita
+       });
+       if (error) alert("Errore: " + error.message);
+       else if (!data.ok) alert("Rifiutato: " + data.error);
+       else { alert("Fatto!"); loadCommentiAdmin(); }
+   }
+
+   async function resetNome(nome) {
+       const nuova = prompt(`Nuova password per il nome "${nome}" (minimo 4 caratteri):`);
+       if (nuova === null) return;                      // ha premuto Annulla
+       const { data, error } = await db.rpc('reset_name_password', {
+           p_name: nome,
+           p_new_password: nuova
+       });
+       if (error) alert("Errore: " + error.message);
+       else if (!data.ok) alert("Rifiutato: " + data.error);
+       else alert(`Password aggiornata per "${nome}". Da ora per usarlo servirà la nuova.`);
+   }

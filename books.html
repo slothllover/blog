@@ -26,15 +26,37 @@
 <body>
     <nav id="navbar-container" data-page="Books"></nav>
 
-    <!-- Books -->
-
-    <div id="books-container">
-        <section class="bookreview">
-            <div class="container">
-                <p style="text-align: center; padding: 20px;">Loading articles...</p>
+    <section class="books-page">
+        <div class="container">
+            <div class="books-header">
+                <h1>Libri</h1>
+                <p>libri che ho letto — filtra per categoria</p>
             </div>
-        </section>
-    </div>
+
+            <!-- Libri: filtro per categoria -->
+            <div class="books-tabs">
+                <button class="tab active" data-filter="all">Tutti</button>
+                <button class="tab" data-filter="Classici">Classici</button>
+                <button class="tab" data-filter="Fantascienza">Fantascienza</button>
+                <button class="tab" data-filter="Filosofia">Filosofia</button>
+                <button class="tab" data-filter="Non-fiction">Non-fiction</button>
+                <button class="tab" data-filter="Politica">Politica</button>
+                <button class="tab" data-filter="Romanzi">Romanzi</button>
+                <button class="tab" data-filter="Scienza">Scienza</button>
+                <button class="tab" data-filter="Storia">Storia</button>
+            </div>
+
+            <!-- Books -->
+
+            <div id="books-container">
+                <section class="bookreview">
+                    <div class="container">
+                        <p style="text-align: center; padding: 20px;">Loading articles...</p>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </section>
 
     <!-- Page Wrapper -->
     <div class="page-wrapper"></div>
