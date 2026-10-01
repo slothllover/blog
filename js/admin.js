@@ -196,6 +196,10 @@ async function uploadToCloudinary(file) {
 // 6. SUBMIT (create OR update)
 // ============================================================
 
+// Post attualmente in modifica: serve a conservare le immagini esistenti
+// quando si salva senza caricare file nuovi (altrimenti l'update le cancella).
+let editingOriginal = null;
+
 const submitBtn = document.getElementById('submit-btn');
 const formStatus = document.getElementById('form-status');
 
@@ -228,6 +232,13 @@ submitBtn.addEventListener('click', async () => {
                 submitBtn.disabled = true;
                 submitBtn.innerText = "Caricamento immagine…";
                 immagineFinale = await uploadToCloudinary(files[0]);
+            } else if (editingOriginal) {
+                // Nessuna immagine nuova: mantieni quella esistente
+                // (se era una galleria, usa la prima immagine come copertina)
+                immagineFinale = editingOriginal.immagine
+                    || (editingOriginal.galleria && Array.isArray(editingOriginal.galleria.images)
+                        ? editingOriginal.galleria.images[0] : "")
+                    || "";
             }
         } else {
             const hasFiles = files.some(f => f !== null);
@@ -245,6 +256,11 @@ submitBtn.addEventListener('click', async () => {
                     urls.push(await uploadToCloudinary(files[i]));
                 }
                 galleriaFinale = { layout: layoutInput, images: urls };
+            } else if (editingOriginal && editingOriginal.galleria
+                       && Array.isArray(editingOriginal.galleria.images)
+                       && editingOriginal.galleria.images.length === cfg.count) {
+                // Nessuna immagine nuova, layout compatibile: riusa quelle esistenti
+                galleriaFinale = { layout: layoutInput, images: editingOriginal.galleria.images.slice() };
             }
         }
     } catch (err) {
@@ -295,6 +311,7 @@ submitBtn.addEventListener('click', async () => {
 // ============================================================
 
 function clearForm() {
+    editingOriginal = null;
     document.getElementById('edit-id').value = '';
     document.getElementById('title').value = '';
     document.getElementById('content').innerHTML = '';
@@ -399,6 +416,8 @@ setupAdminPostFilters();
 async function editPost(id) {
     const { data, error } = await db.from('posts').select('*').eq('id', id).single();
     if (error) { alert("Errore: " + error.message); return; }
+
+    editingOriginal = data;
 
     document.querySelectorAll('.admin-tab[data-tab]').forEach(t => t.classList.remove('active'));
     document.querySelector('.admin-tab[data-tab="new-post"]').classList.add('active');

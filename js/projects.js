@@ -150,7 +150,7 @@ function renderProjects() {
             return `<span class="project-badge ${subClass}">${sub}</span>`;
         }).join('');
 
-        // Single image
+        // Blocco immagini: galleria multi-immagine oppure singola immagine
         let tagImmagine = '';
         const ottimizzaUrl = (url) => {
             if (url && url.includes('cloudinary.com')) {
@@ -159,7 +159,15 @@ function renderProjects() {
             return url;
         };
 
-        if (project.immagine && project.immagine.trim() !== '') {
+        if (project.galleria && Array.isArray(project.galleria.images) && project.galleria.images.length >= 2) {
+            const layout = project.galleria.layout || 'four-grid';
+            const aree = ['a', 'b', 'c', 'd'];
+            const imgTags = project.galleria.images
+                .slice(0, 4)
+                .map((url, i) => `<img src="${ottimizzaUrl(url)}" alt="Immagine ${i + 1}" style="grid-area: ${aree[i]};">`)
+                .join('');
+            tagImmagine = `<div class="gallery gallery-${layout}">${imgTags}</div>`;
+        } else if (project.immagine && project.immagine.trim() !== '') {
             tagImmagine = `<img src="${ottimizzaUrl(project.immagine)}" alt="Cover">`;
         }
 
